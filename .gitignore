@@ -1,0 +1,9 @@
+/target/
+.settings/
+.project
+.classpath
+.mygit
+log/
+doc/
+project/
+*DS_Store
