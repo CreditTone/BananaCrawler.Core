@@ -1,11 +1,18 @@
-package com.banana.common;
+package banana.core;
 
-import java.io.Serializable;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
-public class NodeStatus implements Serializable{
+import org.apache.hadoop.io.Writable;
 
-	private String host;
-	
+public class NodeStatus implements Writable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private long totalMemory;
 	
 	private long freeMemory;
@@ -56,12 +63,22 @@ public class NodeStatus implements Serializable{
 		this.activeThread = activeThread;
 	}
 
-	public String getHost() {
-		return host;
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeLong(totalMemory);
+		out.writeLong(freeMemory);
+		out.writeLong(useMemory);
+		out.writeInt(activeThread);
+		out.writeInt(cpuNum);
 	}
-
-	public void setHost(String host) {
-		this.host = host;
+	
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		totalMemory = in.readLong();
+		freeMemory = in.readLong();
+		useMemory = in.readLong();
+		activeThread = in.readInt();
+		cpuNum = in.readInt();
 	}
 
 }
