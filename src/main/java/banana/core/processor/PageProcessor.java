@@ -2,7 +2,6 @@ package banana.core.processor;
 
 import java.util.List;
 
-import banana.core.download.JavaScriptDriver;
 import banana.core.modle.CrawlData;
 import banana.core.request.BasicRequest;
 import banana.core.request.StartContext;
@@ -16,13 +15,6 @@ import banana.core.response.Page;
  *
  */
 public interface PageProcessor {
-	
-	/**
-	 * 在这里执行你的JS代码。
-	 * @param driver  这个JavaScriptDriver是WebDriver最基本的实现。覆盖WebDriver所有方法
-	 * @throws Exception
-	 */
-	public void executeJS(JavaScriptDriver driver)throws Exception;
 	
 	/**
 	 * 处理一个页面
