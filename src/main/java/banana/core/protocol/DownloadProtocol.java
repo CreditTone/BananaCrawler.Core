@@ -9,7 +9,7 @@ import banana.core.exception.DownloadException;
 
 public interface DownloadProtocol extends VersionedProtocol {
 	
-	public static final long versionID=1L;
+	public static final long versionID = 1L;
 	
 	boolean startDownloadTracker(String trackerId) throws DownloadException;
 	

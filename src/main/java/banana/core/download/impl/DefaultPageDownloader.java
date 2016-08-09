@@ -89,7 +89,7 @@ public class DefaultPageDownloader extends PageDownloader{
 			if(e instanceof NullPointerException){
 				throw new RuntimeException(e); 
 			}
-			log.warn("download error",e);
+			log.warn("download error " + request.getUrl(),e);
 		}finally {
 			if(method != null){
 				method.abort();

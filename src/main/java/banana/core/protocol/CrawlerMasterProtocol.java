@@ -10,6 +10,8 @@ import banana.core.request.BasicRequest;
 
 public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
+	public static final long versionID = 1L;
+	
 	void registerDownloadNode(String remote) throws CrawlerMasterException;
 	
 	void startTask(String taskConfig) throws CrawlerMasterException;
