@@ -6,5 +6,5 @@ package banana.core.protocol;
  *
  */
 public interface Extractor {
-
+	public String parseData(String config,String body) throws Exception;
 }
