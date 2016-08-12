@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 
 import banana.core.modle.CrawlData;
 import banana.core.processor.PageProcessor;
+import banana.core.protocol.Extractor;
 import banana.core.protocol.Task;
 import banana.core.protocol.Task.Processor;
 import banana.core.request.BasicRequest;
@@ -19,6 +20,8 @@ public class JSONConfigPageProcessor implements PageProcessor {
 	private String[] dataParser;
 	
 	private String[] requestParser;
+	
+	private Extractor extractor;
 	
 	public JSONConfigPageProcessor(Processor config) {
 		this.config = config;
