@@ -2,6 +2,7 @@ package banana.core.processor;
 
 import java.util.List;
 
+import banana.core.Static;
 import banana.core.modle.CrawlData;
 import banana.core.request.BasicRequest;
 import banana.core.request.StartContext;

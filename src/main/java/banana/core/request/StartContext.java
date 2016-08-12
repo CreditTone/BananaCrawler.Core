@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import banana.core.processor.BinaryProcessor;
-import banana.core.processor.PageProcessor;
 import banana.core.processor.TransactionCallBack;
 import banana.core.request.HttpRequest.Method;
 import banana.core.request.PageRequest.PageEncoding;
@@ -37,8 +36,8 @@ public final class StartContext {
 	 * @param url
 	 * @param processorCls
 	 */
-	public StartContext(String url,Class<? extends PageProcessor> processorCls) {
-		this(url, processorCls, null);
+	public StartContext(String url,String processor) {
+		this(url, processor, null);
 	}
 	
 	
@@ -48,8 +47,8 @@ public final class StartContext {
 	 * @param processorCls 
 	 * @param pageEncoding  URL对应网页的编码
 	 */
-	public StartContext(String url,Class<? extends PageProcessor> processorCls,PageEncoding pageEncoding) {
-		BasicRequest seed = createPageRequest(url, processorCls, 0 ,pageEncoding);
+	public StartContext(String url,String processor,PageEncoding pageEncoding) {
+		BasicRequest seed = createPageRequest(url, processor, 0 ,pageEncoding);
 		seeds.add(seed);
 	}
 	
@@ -60,11 +59,11 @@ public final class StartContext {
 	 * @param processorCls 下载完成后处理这个网页Page的PageProcessor的class对象
 	 * @return PageRequest
 	 */
-    public static PageRequest createPageRequest(String url,Class<? extends PageProcessor> processorCls){
+    public static PageRequest createPageRequest(String url,String processor){
     	PageRequest req = new PageRequest();
     	req.setUrl(url);
     	req.setMethod(Method.GET);
-    	req.setProcessorClass(processorCls);
+    	req.setProcessor(processor);
     	return req;
     }
     
@@ -78,13 +77,13 @@ public final class StartContext {
      * 使用usePageEncoding。则默认用UTF-8编码
      * @return PageRequest
      */
-    public  static PageRequest createPageRequest(String url,Class<? extends PageProcessor> processorCls,int priority,PageEncoding pageEncoding){
+    public  static PageRequest createPageRequest(String url,String processor,int priority,PageEncoding pageEncoding){
     	if(priority >=0 && priority<=1000){
     		PageRequest req = new PageRequest();
         	req.setUrl(url);
         	req.setMethod(Method.GET);
         	req.setPriority(priority) ;
-        	req.setProcessorClass(processorCls);
+        	req.setProcessor(processor);
         	req.setPageEncoding(pageEncoding);
         	return req;
     	}else{
@@ -100,13 +99,13 @@ public final class StartContext {
      * priority才会起作用并排序。
      * @return PageRequest
      */
-    public  static PageRequest createPageRequest(String url,Class<? extends PageProcessor> processorCls,int priority){
+    public  static PageRequest createPageRequest(String url,String processor,int priority){
     	if(priority >=0 && priority<=1000){
     		PageRequest req = new PageRequest();
     		req.setUrl(url);
     		req.setMethod(Method.GET);
     		req.setPriority(priority) ;
-    		req.setProcessorClass(processorCls);
+    		req.setProcessor(processor);
     		return req;
     	}else{
     		throw new IllegalArgumentException("priority的值必须在0-1000之间");
@@ -119,8 +118,8 @@ public final class StartContext {
      * @param processorCls  文件下载时处理这个InputStream的BinaryProcessor的class对象
      * @return BinaryRequest
      */
-    public static BinaryRequest createBinaryRequest(String url,Class<? extends BinaryProcessor> processorCls){
-    	BinaryRequest req = new BinaryRequest(url, processorCls);
+    public static BinaryRequest createBinaryRequest(String url,String processor){
+    	BinaryRequest req = new BinaryRequest(url, processor);
     	return req;
     }
     

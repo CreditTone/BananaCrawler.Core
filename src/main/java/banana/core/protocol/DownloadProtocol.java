@@ -11,11 +11,9 @@ public interface DownloadProtocol extends VersionedProtocol {
 	
 	public static final long versionID = 1L;
 	
-	boolean startDownloadTracker(String trackerId) throws DownloadException;
+	boolean startDownloadTracker(String taskId,int thread) throws DownloadException;
 	
-	String newDownloadTracker(String taskName,int thread) throws DownloadException;
-	
-	void stopDownloadTracker(String trackerId) throws DownloadException;
+	void stopDownloadTracker(String taskId) throws DownloadException;
 	
 	NodeStatus healthCheck() throws DownloadException;
 }

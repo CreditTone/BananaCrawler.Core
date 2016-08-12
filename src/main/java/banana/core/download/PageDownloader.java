@@ -18,7 +18,7 @@ public abstract class PageDownloader implements Closeable{
      * @param task
      * @return page
      */
-    public abstract Page download(PageRequest request,String taskName);
+    public abstract Page download(PageRequest request);
     
     public abstract boolean supportJavaScript();
     

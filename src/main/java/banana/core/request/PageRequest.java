@@ -21,7 +21,7 @@ public final class PageRequest extends HttpRequest{
     private PageEncoding pageEncoding;
     
     
-    private Class<? extends PageProcessor> processorClass ;
+    private String processor ;
     
     
     protected PageRequest(){
@@ -31,15 +31,15 @@ public final class PageRequest extends HttpRequest{
     
 	
 	    
-	public Class<? extends PageProcessor> getProcessorClass() {
-		return processorClass;
+	public String getProcessor() {
+		return processor;
 	}
 
-	public void setProcessorClass(Class<? extends PageProcessor> processorCls) {
+	public void setProcessor(String processorCls) {
 		if(processorCls == null){
 			throw new NullPointerException("PageReuqest的PageProcessor不能为Null");
 		}else{
-			this.processorClass = processorCls;
+			this.processor = processorCls;
 		}
 	}
 	
@@ -76,7 +76,7 @@ public final class PageRequest extends HttpRequest{
 	@Override
 	public String toString() {
 		return "PageRequest [url=" + url + ", method=" + method + ", pageEncoding=" + pageEncoding + ", requestParams="
-				+ requestParams + ", headers=" + headers + ", processorClass=" + processorClass + ", attributes=" + attributes 
+				+ requestParams + ", headers=" + headers + ", processor=" + processor + ", attributes=" + attributes 
 				+ ", type=" + type + ", getPriority()="
 				+ getPriority() + "]";
 	}

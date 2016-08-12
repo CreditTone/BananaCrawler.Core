@@ -48,7 +48,7 @@ public class DefaultPageDownloader extends PageDownloader{
 	}
 
 	@Override
-	public Page download(PageRequest request,String taskName) {
+	public Page download(PageRequest request) {
 		Page page = go(request);
 		return page;
 	}

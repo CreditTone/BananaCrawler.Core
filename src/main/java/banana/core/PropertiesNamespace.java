@@ -11,7 +11,5 @@ public final class PropertiesNamespace {
 		public static final String MAX_PAGE_RETRY_COUNT = "banana.task.page.maxretrycount";
 	}
 	
-	public static final class Download{
-	}
 	
 }

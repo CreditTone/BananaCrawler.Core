@@ -13,7 +13,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
-
+import banana.core.Static;
 import banana.core.download.FileDownloader;
 import banana.core.processor.BinaryProcessor;
 import banana.core.request.BinaryRequest;
@@ -27,7 +27,7 @@ import banana.core.util.CountableThreadPool;
 public final class DefaultFileDownloader implements FileDownloader, Runnable,Closeable {
 	private final Logger log = Logger.getLogger(DefaultFileDownloader.class);
 
-	private Map<Class<? extends BinaryProcessor>,BinaryProcessor> binaryProccessors = new HashMap<Class<? extends BinaryProcessor>,BinaryProcessor>();
+	private Map<String,BinaryProcessor> binaryProccessors = new HashMap<String,BinaryProcessor>();
 
 	private final BlockingQueue<BinaryRequest> requestQueue = new LinkedBlockingQueue<BinaryRequest>();
 
@@ -112,12 +112,12 @@ public final class DefaultFileDownloader implements FileDownloader, Runnable,Clo
 		}
 	}
 	
-	private synchronized BinaryProcessor addBinaryProccess(Class<? extends BinaryProcessor> proccessCls){
+	private synchronized BinaryProcessor addBinaryProccess(String proccessor){
 		BinaryProcessor proccess = null;
 		try {
-			proccess = proccessCls.newInstance();
-			if(!binaryProccessors.containsKey(proccessCls)){
-				binaryProccessors.put( proccessCls, proccess);
+			proccess = Static.binaryProcessorIndex.get(proccessor).newInstance();
+			if(!binaryProccessors.containsKey(proccessor)){
+				binaryProccessors.put(proccessor, proccess);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -125,11 +125,10 @@ public final class DefaultFileDownloader implements FileDownloader, Runnable,Clo
 		return proccess;
 	}
 	
-	public BinaryProcessor findBinaryProccess(
-			Class<? extends BinaryProcessor> processorCls) {
-		BinaryProcessor pageProcessor = binaryProccessors.get(processorCls);
+	public BinaryProcessor findBinaryProccess(String processor) {
+		BinaryProcessor pageProcessor = binaryProccessors.get(processor);
 		if(pageProcessor == null){
-			pageProcessor = addBinaryProccess(processorCls);
+			pageProcessor = addBinaryProccess(processor);
 		}
 		return pageProcessor;
 	}

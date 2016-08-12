@@ -34,8 +34,6 @@ public abstract class BasicRequest implements Comparable<BasicRequest> ,Serializ
 	
 	protected Type type;
 	
-	protected String processorAddress;
-	
 	/**
      * 父节点的Request
      */
@@ -85,14 +83,6 @@ public abstract class BasicRequest implements Comparable<BasicRequest> ,Serializ
 		this.uuid = uuid;
 	}
 	
-	public String getProcessorAddress() {
-		return processorAddress;
-	}
-
-	public void setProcessorAddress(String processorAddress) {
-		this.processorAddress = processorAddress;
-	}
-
 	/**
 	 * request排序
 	 * getPriority越小  优先级越高   但是对于上层调用无需关心  框架会做反转

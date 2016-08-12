@@ -10,27 +10,27 @@ import banana.core.processor.BinaryProcessor;
  */
 public final class BinaryRequest extends HttpRequest {
 
-	private Class<? extends BinaryProcessor> binaryProccessor;
+	private String binaryProccessor;
 	
 	
 	public BinaryRequest(){
 		this.type = Type.BINARY_REQUEST;
 	}
 	
-	public BinaryRequest(String url, Class<? extends BinaryProcessor> binaryProccessor){
+	public BinaryRequest(String url, String binaryProccessor){
 		this();
 		this.binaryProccessor = binaryProccessor;
 		this.setUrl(url);
 	}
 	
 
-	public Class<? extends BinaryProcessor> getBinaryProccessor() {
+	public String getBinaryProccessor() {
 		return binaryProccessor;
 	}
 	
 	
 
-	public void setBinaryProccessor(Class<? extends BinaryProcessor> binaryProccessor) {
+	public void setBinaryProccessor(String binaryProccessor) {
 		this.binaryProccessor = binaryProccessor;
 	}
 

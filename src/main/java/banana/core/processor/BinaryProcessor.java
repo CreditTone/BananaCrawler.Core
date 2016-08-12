@@ -10,6 +10,9 @@ import banana.core.request.BinaryRequest;
  * 文件请求处理
  */
 public interface BinaryProcessor {
+	
+	public abstract String getName();
+	
 	/**
 	 * 请求文件
 	 * @param binaryRequest
