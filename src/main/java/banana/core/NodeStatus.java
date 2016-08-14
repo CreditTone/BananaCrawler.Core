@@ -81,4 +81,10 @@ public class NodeStatus implements Writable{
 		cpuNum = in.readInt();
 	}
 
+	@Override
+	public String toString() {
+		return "NodeStatus [totalMemory=" + totalMemory + ", freeMemory=" + freeMemory + ", useMemory=" + useMemory
+				+ ", activeThread=" + activeThread + ", cpuNum=" + cpuNum + "]";
+	}
+
 }

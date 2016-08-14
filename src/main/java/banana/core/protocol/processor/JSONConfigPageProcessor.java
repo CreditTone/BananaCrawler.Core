@@ -39,6 +39,15 @@ public class JSONConfigPageProcessor implements PageProcessor {
 	@Override
 	public void process(Page page, StartContext context, List<BasicRequest> queue, List<CrawlData> objectContainer)
 			throws Exception {
+		for (int i = 0; i < dataParser.length; i++) {
+			String responseJson = extractor.parseData(dataParser[i], page.getContent());
+			System.out.println("parse data:" + responseJson);
+		}
+		
+		for (int i = 0; i < requestParser.length; i++) {
+			String responseJson = extractor.parseData(requestParser[i], page.getContent());
+			System.out.println("parse request:" + responseJson);
+		}
 	}
 
 }

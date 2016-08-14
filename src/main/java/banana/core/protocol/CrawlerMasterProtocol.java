@@ -13,7 +13,7 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	public static final long versionID = 1L;
 	
-	void registerDownloadNode(String remote) throws CrawlerMasterException;
+	void registerDownloadNode(String remote,int port) throws CrawlerMasterException;
 	
 	public void startTask(Task config) throws Exception;
 	
