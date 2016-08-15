@@ -15,5 +15,5 @@ public class Page extends BasicResponse{
 	public void setContent(String content) {
 		this.content = content;
 	}
-
+	
 }

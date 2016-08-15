@@ -1,8 +1,14 @@
 package banana.core.request;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import com.alibaba.fastjson.JSON;
+
 import java.util.Map.Entry;
 
 
@@ -23,12 +29,12 @@ public class HttpRequest extends AttributeRequest {
 	 /**
      * request的参数
      */
-    protected HashMap<String, String> requestParams = null;
+    protected Map<String, String> requestParams = null;
     
     /**
      * 请求头
      */
-    protected HashMap<String,String> headers = null;
+    protected Map<String,String> headers = null;
 	
 	protected HttpRequest(){
     	method = Method.GET;
@@ -93,5 +99,32 @@ public class HttpRequest extends AttributeRequest {
     	iniHeadersContainer();
     	return this.headers;
     }
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		super.write(out);
+		out.writeUTF(method.name());
+		out.writeUTF(url);
+		String headersJson = JSON.toJSONString(headers);
+		String requestParamsJson = JSON.toJSONString(requestParams);
+		out.writeUTF(headersJson);
+		out.writeUTF(requestParamsJson);
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		super.readFields(in);
+		String methodName = in.readUTF();
+		if (methodName.equals(Method.GET.name())){
+			method = Method.GET;
+		}else if(methodName.equals(Method.POST.name())){
+			method = Method.POST;
+		}
+		url = in.readUTF();
+		String headersJson = in.readUTF();
+		String requestParamsJson = in.readUTF();
+		headers = JSON.parseObject(headersJson, Map.class);
+		requestParams = JSON.parseObject(requestParamsJson, Map.class);
+	}
 
 }

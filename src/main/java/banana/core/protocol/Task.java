@@ -1,12 +1,21 @@
 package banana.core.protocol;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public final class Task {
+import org.apache.hadoop.io.Writable;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+
+public final class Task implements Writable{
 	
 	public static class Seed{
 		
@@ -59,7 +68,6 @@ public final class Task {
 		public void setProcessor(String processor) {
 			this.processor = processor;
 		}
-		
 	}
 	
 	public static final class CrawlerRequest extends HashMap<String,Object>{}
@@ -149,6 +157,37 @@ public final class Task {
 	 * 页面处理器
 	 */
 	public List<Processor> processors;
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeUTF(name);
+		out.writeInt(thread);
+		String seedJson = JSON.toJSONString(seeds);
+		String processorJson = JSON.toJSONString(processors);
+		out.writeUTF(seedJson);
+		out.writeUTF(processorJson);
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		name = in.readUTF();
+		thread = in.readInt();
+		seeds = new ArrayList<Seed>();
+		String seedJson = in.readUTF();
+		String processorJson = in.readUTF();
+		JSONArray array = JSONArray.parseArray(seedJson);
+		for (int i = 0; i < array.size(); i++) {
+			Seed seed = JSON.parseObject(array.getJSONObject(i).toString(), Seed.class);
+			seeds.add(seed);
+		}
+		processors = new ArrayList<Processor>();
+		array = JSONArray.parseArray(processorJson);
+		for (int i = 0; i < array.size(); i++) {
+			Processor processor = JSON.parseObject(array.getJSONObject(i).toString(), Processor.class);
+			processors.add(processor);
+		}
+	}
+	
 	
 }
 

@@ -13,7 +13,6 @@ import banana.core.processor.TransactionCallBack;
  * 自己的对象添加到child集合中，在下载过程中首先下载TransactionRequest中的所有childRequest，每个childRequest下载完成后使用notify方式逐步向上通知，
  * 直到所有的child下载完成TransactionRequest回调 TransactionCallBack的callBack方法通知业务层这个TransactionRequest下载完成。
  * 
- * @author 郭钟 
  */
 public class TransactionRequest extends AttributeRequest implements TransactionCallBack{
 	

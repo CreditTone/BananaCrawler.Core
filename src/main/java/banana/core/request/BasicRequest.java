@@ -1,10 +1,13 @@
 package banana.core.request;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.apache.hadoop.io.Writable;
 
 
 /**
@@ -14,10 +17,8 @@ import java.util.UUID;
  * 2、requestCount记录Request总共被请求了多少次
  * 3、实现Comparable接口。可排序，和priority相关
  * 
- * @author 郭钟 
- *
  */
-public abstract class BasicRequest implements Comparable<BasicRequest> ,Serializable{
+public abstract class BasicRequest implements Comparable<BasicRequest> ,Writable{
 	
 	protected String uuid = UUID.randomUUID().toString();
 	
@@ -136,5 +137,28 @@ public abstract class BasicRequest implements Comparable<BasicRequest> ,Serializ
 	 */
 	public abstract Set<String> enumAttributeNames();
 	
-	public abstract HashMap<String,Object> getAttributes();
+	public abstract Map<String,Object> getAttributes();
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		out.writeUTF(type.name());
+		out.writeInt(priority);
+		out.writeInt(requestCount);
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		String typeName = in.readUTF();
+		if (typeName.equals(Type.PAGE_REQUEST.name())){
+			type = Type.PAGE_REQUEST;
+		}else if(typeName.equals(Type.BINARY_REQUEST.name())){
+			type = Type.BINARY_REQUEST;
+		}else if(typeName.equals(Type.TRANSACTION_REQUEST.name())){
+			type = Type.TRANSACTION_REQUEST;
+		}
+		priority = in.readInt();
+		requestCount = in.readInt();
+	}
+	
+	
 }

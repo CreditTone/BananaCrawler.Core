@@ -1,6 +1,8 @@
 package banana.core.request;
 
-import banana.core.processor.PageProcessor;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * 网页类型Request的表示。
@@ -53,6 +55,34 @@ public final class PageRequest extends HttpRequest{
 			this.pageEncoding = pageEncoding;
 		}
 	}
+	
+	
+	@Override
+	public void write(DataOutput out) throws IOException {
+		super.write(out);
+		if (pageEncoding == null){
+			pageEncoding = PageEncoding.UTF8;
+		}
+		out.writeUTF(pageEncoding.name());
+		out.writeUTF(processor);
+	}
+
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		super.readFields(in);
+		String pageEncodingName = in.readUTF();
+		if (pageEncodingName.equals(PageEncoding.UTF8.name())){
+			pageEncoding = PageEncoding.UTF8;
+		}else if(pageEncodingName.equals(PageEncoding.GBK.name())){
+			pageEncoding = PageEncoding.GBK;
+		}else if(pageEncodingName.equals(PageEncoding.GB2312.name())){
+			pageEncoding = PageEncoding.GB2312;
+		}
+		processor = in.readUTF();
+	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -72,7 +102,8 @@ public final class PageRequest extends HttpRequest{
 			return false;
 		return true;
 	}
-
+	
+	
 	@Override
 	public String toString() {
 		return "PageRequest [url=" + url + ", method=" + method + ", pageEncoding=" + pageEncoding + ", requestParams="

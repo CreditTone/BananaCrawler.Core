@@ -1,7 +1,13 @@
 package banana.core.request;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * AttributeRequest是BasicRequest操作是属性的实现。
@@ -17,7 +23,7 @@ public class AttributeRequest extends BasicRequest {
 	/**
      * request属性
      */
-    protected HashMap<String,Object> attributes = new HashMap<String, Object>();
+    protected Map<String,Object> attributes = new HashMap<String, Object>();
 
 	@Override
 	public BasicRequest addAttribute(String attribute, Object value) {
@@ -34,7 +40,7 @@ public class AttributeRequest extends BasicRequest {
     	return value;
 	}
 	
-	public HashMap<String,Object> getAttributes(){
+	public Map<String,Object> getAttributes(){
 		return attributes;
 	}
 
@@ -43,4 +49,18 @@ public class AttributeRequest extends BasicRequest {
 		return attributes.keySet();
 	}
 
+	@Override
+	public void write(DataOutput out) throws IOException {
+		super.write(out);
+		String attributesJson = JSON.toJSONString(attributes);
+		out.writeUTF(attributesJson);
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		super.readFields(in);
+		String attributesJson = in.readUTF();
+		attributes = JSON.parseObject(attributesJson, Map.class);
+	}
+	
 }

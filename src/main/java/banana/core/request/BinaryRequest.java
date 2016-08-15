@@ -1,8 +1,8 @@
 package banana.core.request;
 
-
-import banana.core.processor.BinaryProcessor;
-
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * 文件下载类型Request的表示
@@ -37,7 +37,18 @@ public final class BinaryRequest extends HttpRequest {
 	@Override
 	public String toString() {
 		return "BinaryRequest [binaryProccessor=" + binaryProccessor + ", method=" + method + ", url=" + url
-				+ ", requestParams=" + requestParams + ", headers=" + headers + ", attributes=" + attributes + ", uuid="
-				+ uuid + ", type=" + type + "]";
+				+ ", requestParams=" + requestParams + ", headers=" + headers + ", attributes=" + attributes + ", type=" + type + "]";
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		super.write(out);
+		out.writeUTF(binaryProccessor);
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		super.readFields(in);
+		binaryProccessor = in.readUTF();
 	}
 }

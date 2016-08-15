@@ -7,7 +7,5 @@ public interface DownloadTracker {
 	
 	Page sendRequest(PageRequest request);
 	
-	void setFetchSize(int fetchsize);
-	
 	void stop();
 }
