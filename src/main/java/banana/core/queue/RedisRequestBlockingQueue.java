@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import banana.core.JedisOperator;
 import banana.core.JedisOperator.Command;
+import banana.core.request.HttpRequest;
 import banana.core.request.BasicRequest;
 import banana.core.request.BinaryRequest;
 import banana.core.request.PageRequest;
@@ -174,17 +175,17 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 	}
 	
 	@Override
-	public BasicRequest remove() {
-		BasicRequest basicRequest = poll();
-		if (basicRequest == null) {
+	public HttpRequest remove() {
+		HttpRequest HttpRequest = poll();
+		if (HttpRequest == null) {
 			throw new NoSuchElementException("队列长度为0");
 		} 
-		return basicRequest;
+		return HttpRequest;
 	}
 
 	@Override
-	public BasicRequest poll() {
-		BasicRequest basicRequest = null;
+	public HttpRequest poll() {
+		HttpRequest HttpRequest = null;
 		String data = jOperator.exe(new Command<String>() {
 
 			@Override
@@ -200,23 +201,23 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 			}
 		});
 
-		basicRequest = jsonToObject(data);
-		return basicRequest;
+		HttpRequest = jsonToObject(data);
+		return HttpRequest;
 	}
 
 	@Override
-	public BasicRequest element() {
-		BasicRequest basicRequest = peek();
-		if (basicRequest == null) {
+	public HttpRequest element() {
+		HttpRequest HttpRequest = peek();
+		if (HttpRequest == null) {
 			throw new NoSuchElementException("队列长度为0");
 		}
-		return basicRequest;
+		return HttpRequest;
 	}
 
 	
 	@Override
-	public BasicRequest peek() {
-		BasicRequest basicRequest = null;
+	public HttpRequest peek() {
+		HttpRequest HttpRequest = null;
 
 		String data = jOperator.exe(new Command<String>() {
 			@Override
@@ -231,8 +232,8 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 				return null;
 			}
 		});
-		basicRequest = jsonToObject(data);
-		return basicRequest;
+		HttpRequest = jsonToObject(data);
+		return HttpRequest;
 	}
 
 	/**
@@ -288,7 +289,7 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 	}
 
 	@Override
-	public boolean add(final BasicRequest e) {
+	public boolean add(final HttpRequest e) {
 		if (!existQueue(e.getPriority())){
 			generateQueuekey(e.getPriority());
 		}
@@ -316,8 +317,8 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 	}
 
 
-	public BasicRequest take() {
-		BasicRequest basicRequest = null;
+	public HttpRequest take() {
+		HttpRequest httpRequest = null;
 
 		String data = jOperator.exe(new Command<String>() {
 
@@ -335,12 +336,12 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 			}
 		});
 
-		basicRequest = jsonToObject(data);
-		return basicRequest;
+		httpRequest = jsonToObject(data);
+		return httpRequest;
 	}
 
 	@Override
-	public boolean remove(final BasicRequest o) {
+	public boolean remove(final HttpRequest o) {
 		jOperator.exe(new Command<Void>() {
 
 			@Override
@@ -358,7 +359,7 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 		return false;
 	}
 
-	public String objectToJson(BasicRequest obj) {
+	public String objectToJson(HttpRequest obj) {
 		if (obj == null) {
 			return null;
 		}
@@ -366,31 +367,16 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 		return json.toString();
 	}
 
-	public BasicRequest jsonToObject(String json) {
+	public HttpRequest jsonToObject(String json) {
 		if (json == null) {
 			return null;
 		}
-		BasicRequest basicRequest = null;
+		HttpRequest basicRequest = null;
 		JSONObject jsonObj = JSONObject.fromObject(json);
 		String type = jsonObj.getString("type");
 		switch(type){
 			case "PAGE_REQUEST":
 				basicRequest = (PageRequest)JSONObject.toBean(jsonObj, PageRequest.class);
-				break;
-			case "TRANSACTION_REQUEST":
-				List<BasicRequest> list = new ArrayList<BasicRequest>();
-				if (jsonObj.has("childRequest")){
-					JSONArray childRequestJson = jsonObj.getJSONArray("childRequest");
-					BasicRequest item = null;
-					for (int i = 0; i < childRequestJson.size(); i++) {
-						item = jsonToObject(childRequestJson.getString(i));
-						list.add(item);
-					}
-					jsonObj.remove("childRequest");
-				}
-				TransactionRequest transactionRequest = (TransactionRequest)JSONObject.toBean(jsonObj, TransactionRequest.class);
-				transactionRequest.addChildRequest(list);
-				basicRequest =transactionRequest;
 				break;
 			case "BINARY_REQUEST":
 				basicRequest = (BinaryRequest)JSONObject.toBean(jsonObj, BinaryRequest.class);

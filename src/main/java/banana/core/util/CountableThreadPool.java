@@ -1,18 +1,18 @@
 package banana.core.util;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 /**
- * 可计数的线程池。
- * @author 郭钟 
+ * 可计数的线程池
  */
 public class CountableThreadPool implements Closeable{
+	
 	    private int threadNum;
 
 	    private AtomicInteger threadAlive = new AtomicInteger();
@@ -21,20 +21,11 @@ public class CountableThreadPool implements Closeable{
 
 	    private Condition condition = reentrantLock.newCondition();
 	    
-	    private ExecutorService executorService;
+	    private ThreadPoolExecutor executorService;
 
 	    public CountableThreadPool(int threadNum) {
-	        this.threadNum = threadNum;
-	        this.executorService = Executors.newFixedThreadPool(threadNum);
-	    }
-
-	    public CountableThreadPool(int threadNum, ExecutorService executorService) {
-	        this.threadNum = threadNum;
-	        this.executorService = executorService;
-	    }
-
-	    public void setExecutorService(ExecutorService executorService) {
-	        this.executorService = executorService;
+	        executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+	        setThread(threadNum);
 	    }
 
 	    public int getThreadAlive() {
@@ -44,10 +35,13 @@ public class CountableThreadPool implements Closeable{
 	    public int getThreadNum() {
 	        return threadNum;
 	    }
+	    
+	    public void setThread(int thread){
+	    	threadNum = thread;
+	    	executorService.setMaximumPoolSize(threadNum);
+	    }
 
 	    public void execute(final Runnable runnable) {
-
-
 	        if (threadAlive.get() >= threadNum) {
 	            try {
 	                reentrantLock.lock();

@@ -2,7 +2,7 @@ package banana.core.queue;
 
 import java.util.concurrent.PriorityBlockingQueue;
 
-import banana.core.request.BasicRequest;
+import banana.core.request.HttpRequest;
 
 /**
  * 优先级队列
@@ -10,7 +10,7 @@ import banana.core.request.BasicRequest;
  *
  */
 public final class RequestPriorityBlockingQueue extends
-		PriorityBlockingQueue<BasicRequest> implements BlockingRequestQueue{
+		PriorityBlockingQueue<HttpRequest> implements BlockingRequestQueue{
 
 	/**
 	 * 
@@ -23,7 +23,7 @@ public final class RequestPriorityBlockingQueue extends
 	}
 
 	@Override
-	public boolean remove(BasicRequest e) {
+	public boolean remove(HttpRequest e) {
 		return super.remove(e);
 	}
 	

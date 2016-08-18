@@ -2,7 +2,7 @@ package banana.core.queue;
 
 import java.io.Serializable;
 
-import banana.core.request.BasicRequest;
+import banana.core.request.HttpRequest;
 
 
 /**
@@ -30,7 +30,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 	}
 	
 	
-	public BasicRequest poll() {
+	public HttpRequest poll() {
 		synchronized (queue) {
 			while ((System.currentTimeMillis() - lastSuccesfullPop <= delayInMilliseconds) && !queue.isEmpty()) {
 				sleep();
@@ -40,7 +40,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 		}
 	}
 
-	public BasicRequest take() throws InterruptedException {
+	public HttpRequest take() throws InterruptedException {
 		synchronized (queue) {
 			while ((System.currentTimeMillis() - lastSuccesfullPop <= delayInMilliseconds) && !queue.isEmpty()) {
 				sleep();
@@ -50,7 +50,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 		}
 	}
 
-	public BasicRequest remove() {
+	public HttpRequest remove() {
 		return queue.remove();
 	}
 
@@ -64,7 +64,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 
 	// Delegate Methods. Java is just soooo fun sometimes...
 
-	public boolean add(final BasicRequest e) {
+	public boolean add(final HttpRequest e) {
 		return queue.add(e);
 	}
 
@@ -73,7 +73,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 	}
 
 
-	public BasicRequest element() {
+	public HttpRequest element() {
 		return queue.element();
 	}
 
@@ -91,7 +91,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 		return queue.isEmpty();
 	}
 
-	public BasicRequest peek() {
+	public HttpRequest peek() {
 		return queue.peek();
 	}
 
@@ -100,7 +100,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 	}
 
 	@Override
-	public boolean remove(BasicRequest e) {
+	public boolean remove(HttpRequest e) {
 		return queue.remove(e);
 	}
 

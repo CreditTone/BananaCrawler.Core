@@ -111,6 +111,8 @@ public final class Task implements Writable{
 	public void verify() throws Exception {
 		if (name == null || name.trim().equals("")){
 			throw new NullPointerException("task name cannot be null");
+		}else if(name.contains("_")){
+			throw new IllegalArgumentException("name cannot contain underscore symbols");
 		}
 		if (processors == null || processors.isEmpty()){
 			throw new Exception("There is no processors");
@@ -148,6 +150,8 @@ public final class Task implements Writable{
 	
 	public int thread;
 	
+	public String filter;
+	
 	/**
 	 * 任务的初始种子
 	 */
@@ -162,6 +166,7 @@ public final class Task implements Writable{
 	public void write(DataOutput out) throws IOException {
 		out.writeUTF(name);
 		out.writeInt(thread);
+		out.writeUTF(filter == null?"":filter);
 		String seedJson = JSON.toJSONString(seeds);
 		String processorJson = JSON.toJSONString(processors);
 		out.writeUTF(seedJson);
@@ -172,6 +177,7 @@ public final class Task implements Writable{
 	public void readFields(DataInput in) throws IOException {
 		name = in.readUTF();
 		thread = in.readInt();
+		filter = in.readUTF();
 		seeds = new ArrayList<Seed>();
 		String seedJson = in.readUTF();
 		String processorJson = in.readUTF();

@@ -3,6 +3,7 @@ package banana.core.response;
 import java.util.Map;
 
 import banana.core.request.BasicRequest;
+import banana.core.request.HttpRequest;
 
 public class BasicResponse {
 	
@@ -12,7 +13,7 @@ public class BasicResponse {
 	
 	protected Map<String,String> responseHeader;
 	
-	protected BasicRequest basicRequest;
+	protected HttpRequest basicRequest;
 	
 	public int getStatus(){
 		return statusCode;
@@ -22,11 +23,11 @@ public class BasicResponse {
 		statusCode = status;
 	}
 
-	public BasicRequest getRequest(){
+	public HttpRequest getRequest(){
 		return basicRequest;
 	}
 	
-	public void setRequest(BasicRequest request){
+	public void setRequest(HttpRequest request){
 		basicRequest = request;
 	}
 

@@ -22,7 +22,7 @@ public final class StartContext {
 	/**
 	 * 定义根url
 	 */
-	private List<BasicRequest> seeds = new ArrayList<BasicRequest>();
+	private List<HttpRequest> seeds = new ArrayList<HttpRequest>();
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -48,7 +48,7 @@ public final class StartContext {
 	 * @param pageEncoding  URL对应网页的编码
 	 */
 	public StartContext(String url,String processor,PageEncoding pageEncoding) {
-		BasicRequest seed = createPageRequest(url, processor, 0 ,pageEncoding);
+		HttpRequest seed = createPageRequest(url, processor, 0 ,pageEncoding);
 		seeds.add(seed);
 	}
 	
@@ -168,7 +168,7 @@ public final class StartContext {
 	 * 注入种子
 	 * @param request
 	 */
-	public void injectSeed(BasicRequest request){
+	public void injectSeed(HttpRequest request){
 		this.seeds.add(request);
 	}
 	
@@ -176,7 +176,7 @@ public final class StartContext {
 	 * 返回该StartContext所包含的所有种子URL
 	 * @return
 	 */
-	public List<BasicRequest> getSeedRequests(){
+	public List<HttpRequest> getSeedRequests(){
 		return this.seeds;
 	}
 	
@@ -184,8 +184,8 @@ public final class StartContext {
 	 * 返回该StartContext所包含的所有种子URL
 	 * @return
 	 */
-	public List<BasicRequest> getSeedRequestsAndClear(){
-		List<BasicRequest> s = this.seeds;
+	public List<HttpRequest> getSeedRequestsAndClear(){
+		List<HttpRequest> s = this.seeds;
 		this.seeds = new ArrayList<>();
 		return s;
 	}

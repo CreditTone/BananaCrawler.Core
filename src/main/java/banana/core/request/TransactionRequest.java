@@ -9,7 +9,7 @@ import banana.core.processor.TransactionCallBack;
 
 /**
  * 为了实现和维护并发抓取的属性信息提供线程安全的事务请求。TransactionRequest是一个抽象类自己不能设置Processor，却需要实现
- * TransactionCallBack接口。TransactionRequest是个复合的BasicRequest。他可以将多个PageRequest、BinaryRequest甚至TransactionRequest
+ * TransactionCallBack接口。TransactionRequest是个复合的HttpRequest。他可以将多个PageRequest、BinaryRequest甚至TransactionRequest
  * 自己的对象添加到child集合中，在下载过程中首先下载TransactionRequest中的所有childRequest，每个childRequest下载完成后使用notify方式逐步向上通知，
  * 直到所有的child下载完成TransactionRequest回调 TransactionCallBack的callBack方法通知业务层这个TransactionRequest下载完成。
  * 
@@ -33,7 +33,7 @@ public class TransactionRequest extends AttributeRequest implements TransactionC
 
 
 	/**
-	 * 添加一个BasicRequest到TransactionRequest的child中
+	 * 添加一个HttpRequest到TransactionRequest的child中
 	 * @param request
 	 */
 	public void addChildRequest(BasicRequest request){
@@ -45,9 +45,9 @@ public class TransactionRequest extends AttributeRequest implements TransactionC
 		childRequest.add(request);
 	}
 	
-	public void addChildRequest(List<BasicRequest> childRequest) {
+	public void addChildRequest(List<HttpRequest> childRequest) {
 		if (childRequest != null){
-			for (BasicRequest request : childRequest) {
+			for (HttpRequest request : childRequest) {
 				addChildRequest(request);
 			}
 		}
