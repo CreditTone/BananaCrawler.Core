@@ -17,6 +17,8 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	void submitTask(Task config) throws Exception;
 	
+	boolean existTask(String taskName);
+	
 	Object getTaskPropertie(String taskId,String name) ;
 	
 	Object getMasterPropertie(String name) throws CrawlerMasterException;

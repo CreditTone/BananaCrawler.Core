@@ -15,6 +15,6 @@ public interface DataProcessor {
 	 * 所有的结构化数据将流向这里。在这里存储你的bean
 	 * @param procdata
 	 */
-	public void process(List<CrawlData> objectContainer) throws Exception;
+	public void process(List<CrawlData> objectContainer,String ... args) throws Exception;
 	
 }

@@ -114,6 +114,11 @@ public final class Task implements Writable{
 		}else if(name.contains("_")){
 			throw new IllegalArgumentException("name cannot contain underscore symbols");
 		}
+		if (collection == null || collection.trim().equals("")){
+			throw new NullPointerException("task collection cannot be null");
+		}else if(collection.contains("_")){
+			throw new IllegalArgumentException("collection cannot contain underscore symbols");
+		}
 		if (processors == null || processors.isEmpty()){
 			throw new Exception("There is no processors");
 		}
@@ -148,6 +153,8 @@ public final class Task implements Writable{
 	 */
 	public String name;
 	
+	public String collection;
+	
 	public int thread;
 	
 	public String filter;
@@ -165,6 +172,7 @@ public final class Task implements Writable{
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeUTF(name);
+		out.writeUTF(collection);
 		out.writeInt(thread);
 		out.writeUTF(filter == null?"":filter);
 		String seedJson = JSON.toJSONString(seeds);
@@ -176,6 +184,7 @@ public final class Task implements Writable{
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		name = in.readUTF();
+		collection = in.readUTF();
 		thread = in.readInt();
 		filter = in.readUTF();
 		seeds = new ArrayList<Seed>();
