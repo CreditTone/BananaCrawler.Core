@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.hadoop.io.Writable;
@@ -72,7 +73,40 @@ public final class Task implements Writable{
 	
 	public static final class CrawlerRequest extends HashMap<String,Object>{}
 	
-	public static final class CrawlerData extends HashMap<String,Object>{}
+	public static final class CrawlerData extends HashMap<String,Object>{
+		
+		private HashMap<String,Object> cite = new HashMap<String,Object>();
+		
+		@Override
+		public Object put(String key, Object value) {
+			if (value instanceof String && value.toString().startsWith("$")){
+				String valueString = (String) value;
+				cite.put(key, valueString);
+				return valueString;
+			}
+			return super.put(key, value);
+		}
+
+		@Override
+		public void putAll(Map<? extends String, ? extends Object> m) {
+			for (Entry<? extends String, ? extends Object> entry : m.entrySet()) {
+				put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		
+		@Override
+		public Set<Entry<String, Object>> entrySet() {
+			Set<Entry<String, Object>> entrys = new HashSet<Entry<String, Object>>(super.entrySet());
+			entrys.addAll(cite.entrySet());
+			return entrys;
+		}
+
+		public HashMap<String, Object> getCite() {
+			return cite;
+		}
+		
+	}
 	
 	public static final class Processor {
 		
