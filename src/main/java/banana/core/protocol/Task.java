@@ -202,6 +202,8 @@ public final class Task implements Writable{
 	 * 页面处理器
 	 */
 	public List<Processor> processors;
+	
+	public String data;
 
 	@Override
 	public void write(DataOutput out) throws IOException {

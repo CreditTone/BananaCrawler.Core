@@ -32,13 +32,10 @@ public class CrawlData implements Serializable{
 		this.link = link;
 		this.data = (DBObject) JSON.parse(data);
 		this.crawlTime = new Date();
-		BasicDBObject dbObject = new BasicDBObject();
-		dbObject.put("task_id", taskId);
-		dbObject.put("task_name", taskName);
-		dbObject.put("link", link);
-		dbObject.put("crawl_time", crawlTime);
-		dbObject.put("body", this.data);
-		this.data = dbObject;
+		this.data.put("_task_id", taskId);
+		this.data.put("_task_name", taskName);
+		this.data.put("_link", link);
+		this.data.put("_crawl_time", crawlTime);
 	}
 
 	public String getTaskId() {

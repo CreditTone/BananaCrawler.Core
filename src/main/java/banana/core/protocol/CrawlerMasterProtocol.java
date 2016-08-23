@@ -1,6 +1,9 @@
 package banana.core.protocol;
 
 
+import org.apache.hadoop.io.BooleanWritable;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.ipc.VersionedProtocol;
 
 
@@ -17,16 +20,18 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	void submitTask(Task config) throws Exception;
 	
-	boolean existTask(String taskName);
+	BooleanWritable existTask(String taskName);
 	
-	Object getTaskPropertie(String taskId,String name) ;
+	BooleanWritable dataExists(String collection,String taskName);
 	
-	Object getMasterPropertie(String name) throws CrawlerMasterException;
+	IntWritable removeBeforeResult(String collection,String taskName) throws Exception;
+	
+	Text getMasterPropertie(String name) throws CrawlerMasterException;
 	
 	void pushTaskRequest(String taskId,HttpRequest request) throws CrawlerMasterException;
 	
 	HttpRequest pollTaskRequest(String taskId) throws CrawlerMasterException;
-	
-	//Object getStartContextAttribute(String taskName,String hashCode,String attribute) throws java.rmi.RemoteException;
+
+	//Text getStartContextAttribute(String taskName,String hashCode,String attribute) throws java.rmi.RemoteException;
 	
 }
