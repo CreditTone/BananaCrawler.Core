@@ -11,4 +11,13 @@ public class NotFilter implements Filter {
 		return false;
 	}
 
+	@Override
+	public byte[] toBytes() {
+		return new byte[]{};
+	}
+
+	@Override
+	public void load(byte[] data) {
+	}
+
 }

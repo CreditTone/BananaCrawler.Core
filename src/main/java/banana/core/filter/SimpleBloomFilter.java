@@ -1,8 +1,11 @@
 package banana.core.filter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.BitSet;
-import java.util.Random;
-import java.util.UUID;
 
 public class SimpleBloomFilter implements Filter {
 	private static final int DEFAULT_SIZE = 2 << 24;
@@ -58,6 +61,65 @@ public class SimpleBloomFilter implements Filter {
 				result = seed * result + value.charAt(i);
 			}
 			return (cap - 1) & result;
+		}
+	}
+
+	@Override
+	public byte[] toBytes() {
+		ByteArrayOutputStream os = null;
+		ObjectOutputStream oos = null;
+		try{
+			os = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(os);
+			oos.writeObject(bits);
+			oos.flush();
+			return os.toByteArray();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if (oos != null){
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (os != null){
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void load(byte[] data) {
+		ByteArrayInputStream bais = null;
+		ObjectInputStream ois = null;
+		try{
+			bais = new ByteArrayInputStream(data);
+			ois = new ObjectInputStream(bais);
+			bits = (BitSet) ois.readObject();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if (ois != null){
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (bais != null){
+				try {
+					bais.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	

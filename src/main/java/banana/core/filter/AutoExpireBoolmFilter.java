@@ -12,5 +12,14 @@ public class AutoExpireBoolmFilter implements Filter{
 	public boolean contains(String value) {
 		return false;
 	}
+
+	@Override
+	public byte[] toBytes() {
+		return null;
+	}
+
+	@Override
+	public void load(byte[] data) {
+	}
 	
 }

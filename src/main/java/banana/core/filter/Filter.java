@@ -6,4 +6,7 @@ public interface Filter {
 
 	boolean contains(String value);
 
+	byte[] toBytes();
+	
+	void load(byte[] data);
 }
