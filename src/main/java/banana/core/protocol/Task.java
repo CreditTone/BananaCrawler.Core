@@ -191,6 +191,8 @@ public final class Task implements Writable{
 	
 	public int thread;
 	
+	public Map<String,Object> queue;
+	
 	public String filter;
 	
 	/**
@@ -211,8 +213,10 @@ public final class Task implements Writable{
 		out.writeUTF(collection);
 		out.writeInt(thread);
 		out.writeUTF(filter == null?"":filter);
+		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds);
 		String processorJson = JSON.toJSONString(processors);
+		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
 		out.writeUTF(processorJson);
 	}
@@ -223,9 +227,13 @@ public final class Task implements Writable{
 		collection = in.readUTF();
 		thread = in.readInt();
 		filter = in.readUTF();
-		seeds = new ArrayList<Seed>();
+		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
 		String processorJson = in.readUTF();
+		
+		queue = JSON.parseObject(queueJson, Map.class);
+		
+		seeds = new ArrayList<Seed>();
 		JSONArray array = JSONArray.parseArray(seedJson);
 		for (int i = 0; i < array.size(); i++) {
 			Seed seed = JSON.parseObject(array.getJSONObject(i).toString(), Seed.class);
