@@ -23,29 +23,12 @@ public final class PageRequest extends HttpRequest{
     private PageEncoding pageEncoding;
     
     
-    private String processor ;
-    
     
     protected PageRequest(){
     	type = type.PAGE_REQUEST;
     	method = Method.GET;
     }
     
-	
-	    
-	public String getProcessor() {
-		return processor;
-	}
-
-	public void setProcessor(String processorCls) {
-		if(processorCls == null){
-			throw new NullPointerException("PageReuqest的PageProcessor不能为Null");
-		}else{
-			this.processor = processorCls;
-		}
-	}
-	
-
 	public PageEncoding getPageEncoding() {
 		return pageEncoding;
 	}
@@ -64,7 +47,6 @@ public final class PageRequest extends HttpRequest{
 			pageEncoding = PageEncoding.UTF8;
 		}
 		out.writeUTF(pageEncoding.name());
-		out.writeUTF(processor);
 	}
 
 
@@ -79,10 +61,8 @@ public final class PageRequest extends HttpRequest{
 		}else if(pageEncodingName.equals(PageEncoding.GB2312.name())){
 			pageEncoding = PageEncoding.GB2312;
 		}
-		processor = in.readUTF();
 	}
-
-
+	
 
 	@Override
 	public boolean equals(Object obj) {
@@ -111,7 +91,5 @@ public final class PageRequest extends HttpRequest{
 				+ ", type=" + type + ", getPriority()="
 				+ getPriority() + "]";
 	}
-
-
 
 }

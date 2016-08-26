@@ -1,5 +1,8 @@
 package banana.core.queue;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import banana.core.request.BasicRequest;
@@ -20,5 +23,5 @@ public class SimpleBlockingQueue extends LinkedBlockingQueue<HttpRequest> implem
 	public boolean remove(HttpRequest e) {
 		return super.remove(e);
 	}
-
+	
 }

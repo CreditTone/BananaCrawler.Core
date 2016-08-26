@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.hadoop.io.Writable;
+
+import banana.core.BytesWritable;
 
 
 /**
@@ -18,7 +19,7 @@ import org.apache.hadoop.io.Writable;
  * 3、实现Comparable接口。可排序，和priority相关
  * 
  */
-public abstract class BasicRequest implements Comparable<BasicRequest> ,Writable{
+public abstract class BasicRequest extends BytesWritable implements Comparable<BasicRequest>{
 	
 	protected String uuid = UUID.randomUUID().toString();
 	
@@ -159,6 +160,5 @@ public abstract class BasicRequest implements Comparable<BasicRequest> ,Writable
 		priority = in.readInt();
 		requestCount = in.readInt();
 	}
-	
 	
 }

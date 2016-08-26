@@ -20,11 +20,13 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	void submitTask(Task config) throws Exception;
 	
-	BooleanWritable existTask(String taskName);
+	BooleanWritable existTask(String taskname);
 	
-	BooleanWritable dataExists(String collection,String taskName);
+	BooleanWritable dataExists(String collection,String taskname);
 	
-	IntWritable removeBeforeResult(String collection,String taskName) throws Exception;
+	BooleanWritable statExists(String collection,String taskname);
+	
+	IntWritable removeBeforeResult(String collection,String taskname) throws Exception;
 	
 	Text getMasterPropertie(String name) throws CrawlerMasterException;
 	
@@ -32,6 +34,6 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	HttpRequest pollTaskRequest(String taskId) throws CrawlerMasterException;
 
-	//Text getStartContextAttribute(String taskName,String hashCode,String attribute) throws java.rmi.RemoteException;
+	//Text getStartContextAttribute(String taskname,String hashCode,String attribute) throws java.rmi.RemoteException;
 	
 }

@@ -38,7 +38,7 @@ public class CountableThreadPool implements Closeable{
 	    
 	    public void setThread(int thread){
 	    	threadNum = thread;
-	    	executorService.setMaximumPoolSize(threadNum);
+	    	executorService.setMaximumPoolSize(threadNum * 3);
 	    }
 
 	    public void execute(final Runnable runnable) {

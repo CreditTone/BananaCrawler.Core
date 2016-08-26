@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * AttributeRequest是BasicRequest操作是属性的实现。
- * @author 郭钟 
  *
  */
 public class AttributeRequest extends BasicRequest {

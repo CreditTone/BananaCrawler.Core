@@ -89,7 +89,7 @@ public final class DefaultFileDownloader implements FileDownloader, Runnable,Clo
 				String url = request.getUrl();
 				method = new HttpGet(url);
 				HttpResponse response = client.execute(method);
-				BinaryProcessor binaryProccessor = findBinaryProccess(request.getBinaryProccessor());
+				BinaryProcessor binaryProccessor = findBinaryProccess(request.getProcessor());
 				in = response.getEntity().getContent();
 				if(binaryProccessor != null && (response.getStatusLine().getStatusCode() % 200) < 100){
 					binaryProccessor.process(request, in,requestQueue);

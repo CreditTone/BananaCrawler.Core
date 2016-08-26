@@ -13,7 +13,7 @@ public class NotFilter implements Filter {
 
 	@Override
 	public byte[] toBytes() {
-		return new byte[]{};
+		return null;
 	}
 
 	@Override

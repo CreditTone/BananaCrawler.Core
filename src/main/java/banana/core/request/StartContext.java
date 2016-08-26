@@ -1,10 +1,17 @@
 package banana.core.request;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import banana.core.processor.BinaryProcessor;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+
+import banana.core.BytesWritable;
 import banana.core.processor.TransactionCallBack;
 import banana.core.request.HttpRequest.Method;
 import banana.core.request.PageRequest.PageEncoding;
@@ -13,7 +20,7 @@ import banana.core.request.PageRequest.PageEncoding;
  *  StartContext是注入时所有seed的上下文信息如果爬虫在抓取过程当中需要共享一些变量。那么可使用StartContext作为容器。
  *
  */
-public final class StartContext {
+public final class StartContext extends BytesWritable{
 	
 	/**
 	 * 全局属性
@@ -231,4 +238,42 @@ public final class StartContext {
 	public boolean isEmpty(){
 		return seeds.isEmpty();
 	}
+	
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+		String contextAttributeJson = JSON.toJSONString(contextAttribute);
+		out.writeUTF(contextAttributeJson);
+//		byte[][] seedBytes = new byte[seeds.size()][];
+//		for (int x = 0; x < seeds.size() ; x ++) {
+//			HttpRequest seed = seeds.get(x);
+//			seedBytes[x] = seed.toBytes();
+//		}
+//		JSONArray cutpoint = new JSONArray();
+//		for (int i = 0; i < seedBytes.length; i++) {
+//			cutpoint.add(seedBytes[i].length);
+//		}
+//		out.writeUTF(cutpoint.toJSONString());
+//		for (int i = 0; i < seedBytes.length; i++) {
+//			out.write(seedBytes[i]);
+//		}
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		String contextAttributeJson = in.readUTF();
+		HashMap<String, Object> attribute = JSON.parseObject(contextAttributeJson, HashMap.class);
+		contextAttribute.putAll(attribute);
+//		JSONArray cutpoint = JSON.parseArray(in.readUTF());
+//		PageRequest seed = null;
+//		for (int i = 0; i < cutpoint.size(); i++) {
+//			int size = cutpoint.getIntValue(i);
+//			byte[] requestBody = new byte[size];
+//			in.readFully(requestBody);
+//			seed = createPageRequest("", "");
+//			seed.load(requestBody);
+//			seeds.add(seed);
+//		}
+	}
+	
 }

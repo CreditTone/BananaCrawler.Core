@@ -1,5 +1,8 @@
 package banana.core.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -55,4 +58,30 @@ public final class SystemUtil {
         return ipList.isEmpty()?null:ipList.get(0);
     }
 	
+	public static byte[] inputStreamToBytes(InputStream in){
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		byte[] buf = null;
+		try{
+			int len = 0;
+			buf = new byte[1024];
+			while((len = in.read(buf)) != -1){
+				out.write(buf, 0, len);
+			}
+			buf = out.toByteArray();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try {
+				in.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return buf;
+	}
 }

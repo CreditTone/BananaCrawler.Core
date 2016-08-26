@@ -1,12 +1,14 @@
 package banana.core.queue;
 
+import org.apache.hadoop.io.Writable;
+
 import banana.core.request.HttpRequest;
 
 /**
  * 线程安全的可阻塞式队列接口
  *
  */
-public interface BlockingRequestQueue {
+public interface BlockingRequestQueue{
 	
 	/**
 	 * 检索并移除此队列的头，如果此队列为空，则返回 null。 

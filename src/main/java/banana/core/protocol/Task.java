@@ -142,6 +142,14 @@ public final class Task implements Writable{
 
 	}
 	
+	public static final class Filter{
+		
+		public String type;
+		
+		public HashSet<String>  target;
+
+	}
+	
 	public void verify() throws Exception {
 		if (name == null || name.trim().equals("")){
 			throw new NullPointerException("task name cannot be null");
@@ -199,7 +207,7 @@ public final class Task implements Writable{
 	
 	public Map<String,Object> queue;
 	
-	public String filter;
+	public Filter filter;
 	
 	/**
 	 * 任务的初始种子
@@ -212,6 +220,8 @@ public final class Task implements Writable{
 	public List<Processor> processors;
 	
 	public String data;
+	
+	public boolean synchronizeStat;
 
 	@Override
 	public void write(DataOutput out) throws IOException {
@@ -219,10 +229,12 @@ public final class Task implements Writable{
 		out.writeUTF(collection);
 		out.writeInt(thread);
 		out.writeInt(loops);
-		out.writeUTF(filter == null?"":filter);
+		out.writeBoolean(synchronizeStat);
+		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds);
 		String processorJson = JSON.toJSONString(processors);
+		out.writeUTF(filterJson);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
 		out.writeUTF(processorJson);
@@ -234,10 +246,13 @@ public final class Task implements Writable{
 		collection = in.readUTF();
 		thread = in.readInt();
 		loops = in.readInt();
-		filter = in.readUTF();
+		synchronizeStat = in.readBoolean();
+		String filterJson = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
 		String processorJson = in.readUTF();
+		
+		filter = JSON.parseObject(filterJson, Filter.class);
 		
 		queue = JSON.parseObject(queueJson, Map.class);
 		
