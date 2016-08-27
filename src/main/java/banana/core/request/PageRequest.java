@@ -20,7 +20,7 @@ public final class PageRequest extends HttpRequest{
   //  	AUTO;
     }
 
-    private PageEncoding pageEncoding;
+    private PageEncoding pageEncoding = PageEncoding.UTF8;;
     
     
     
@@ -43,9 +43,6 @@ public final class PageRequest extends HttpRequest{
 	@Override
 	public void write(DataOutput out) throws IOException {
 		super.write(out);
-		if (pageEncoding == null){
-			pageEncoding = PageEncoding.UTF8;
-		}
 		out.writeUTF(pageEncoding.name());
 	}
 
