@@ -71,15 +71,15 @@ public final class Task implements Writable{
 		}
 	}
 	
-	public static final class CrawlerRequest extends HashMap<String,Object>{}
-	
-	public static final class CrawlerData extends HashMap<String,Object>{
-		
+	public static class ExpandableHashMap extends HashMap<String,Object>{
+
 		private HashMap<String,Object> cite = new HashMap<String,Object>();
 		
 		@Override
 		public Object put(String key, Object value) {
-			if (value instanceof String && value.toString().startsWith("$")){
+			if (value instanceof String 
+				&& value.toString().contains("{{") 
+				&& value.toString().contains("}}")){
 				String valueString = (String) value;
 				cite.put(key, valueString);
 				return valueString;
@@ -108,13 +108,32 @@ public final class Task implements Writable{
 		
 	}
 	
+	public static final class CrawlerRequest extends ExpandableHashMap{}
+	
+	public static final class CrawlerData extends ExpandableHashMap{}
+	
+	public static final class ContentProcessor{
+		
+		public List<String> direct;
+		
+		public Map<String,Object> define;
+		
+	}
+	
 	public static final class Processor {
 		
 		private String index;
 		
+		private ContentProcessor content;
+		
+		private Map<String,Object> page_context;
+		
+		private Map<String,Object> task_context;
+		
 		private CrawlerRequest[] crawler_request;
 		
 		private CrawlerData[] crawler_data;
+		
 
 		public String getIndex() {
 			return index;
@@ -122,6 +141,30 @@ public final class Task implements Writable{
 
 		public void setIndex(String index) {
 			this.index = index;
+		}
+		
+		public ContentProcessor getContent() {
+			return content;
+		}
+
+		public void setContent(ContentProcessor content) {
+			this.content = content;
+		}
+
+		public Map<String, Object> getPage_context() {
+			return page_context;
+		}
+
+		public void setPage_context(Map<String, Object> page_context) {
+			this.page_context = page_context;
+		}
+
+		public Map<String, Object> getTask_context() {
+			return task_context;
+		}
+
+		public void setTask_context(Map<String, Object> task_context) {
+			this.task_context = task_context;
 		}
 
 		public CrawlerRequest[] getCrawler_request() {
