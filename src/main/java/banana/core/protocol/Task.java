@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.hadoop.io.Writable;
@@ -77,8 +76,11 @@ public final class Task implements Writable{
 		
 		@Override
 		public Object put(String key, Object value) {
+			if (key.startsWith("_")){
+				return super.put(key, value);
+			}
 			if (value instanceof String 
-				&& value.toString().contains("{{") 
+				&& value.toString().contains("{{")
 				&& value.toString().contains("}}")){
 				String valueString = (String) value;
 				cite.put(key, valueString);
