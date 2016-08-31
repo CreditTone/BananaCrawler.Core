@@ -22,7 +22,7 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	BooleanWritable existTask(String taskname);
 	
-	BooleanWritable dataExists(String collection,String taskname);
+	BooleanWritable taskdataExists(String collection,String taskname);
 	
 	BooleanWritable statExists(String collection,String taskname);
 	
@@ -33,6 +33,8 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	void pushTaskRequest(String taskId,HttpRequest request) throws CrawlerMasterException;
 	
 	HttpRequest pollTaskRequest(String taskId) throws CrawlerMasterException;
+	
+	BooleanWritable filterQuery(String taskId,String ... fields);
 
 	//Text getStartContextAttribute(String taskname,String hashCode,String attribute) throws java.rmi.RemoteException;
 	

@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,12 +72,17 @@ public final class Task implements Writable{
 	}
 	
 	public static class ExpandableHashMap extends HashMap<String,Object>{
+		
+		private List<String> unique = null;
 
 		private HashMap<String,Object> cite = new HashMap<String,Object>();
 		
 		@Override
 		public Object put(String key, Object value) {
-			if (key.startsWith("_")){
+			if (key.equals("_unique")){
+				unique = (List<String>) value;
+				return value;
+			}else if (key.startsWith("_")){
 				return super.put(key, value);
 			}
 			if (value instanceof String 
@@ -101,11 +107,22 @@ public final class Task implements Writable{
 		public Set<Entry<String, Object>> entrySet() {
 			Set<Entry<String, Object>> entrys = new HashSet<Entry<String, Object>>(super.entrySet());
 			entrys.addAll(cite.entrySet());
+			HashMap<String,Object> uniqueMap = new HashMap<String,Object>();
+			uniqueMap.put("_unique", unique);
+			entrys.addAll(uniqueMap.entrySet());
 			return entrys;
 		}
 
 		public HashMap<String, Object> getCite() {
 			return cite;
+		}
+		
+		public Collection<String> getUnique(){
+			return unique;
+		}
+		
+		public String getUnique(int index){
+			return unique.get(index);
 		}
 		
 	}
@@ -236,6 +253,10 @@ public final class Task implements Writable{
 		
 		if (loops <= 0){
 			loops = 1;
+		}
+		
+		if (filter.target == null){
+			filter.target = new HashSet<String>();
 		}
 	}
 	
