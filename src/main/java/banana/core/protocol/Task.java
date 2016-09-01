@@ -73,13 +73,21 @@ public final class Task implements Writable{
 	
 	public static class ExpandableHashMap extends HashMap<String,Object>{
 		
+		private String tag = null;
+		
+		private String sendRequest = null;
+		
 		private List<String> unique = null;
 
 		private HashMap<String,Object> cite = new HashMap<String,Object>();
 		
 		@Override
 		public Object put(String key, Object value) {
-			if (key.equals("_unique")){
+			if (key.equals("_tag")){
+				tag = (String) value;
+			}else if (key.equals("_sendrequest")){
+				sendRequest = (String) value;
+			}else if (key.equals("_unique")){
 				unique = (List<String>) value;
 				return value;
 			}else if (key.startsWith("_")){
@@ -109,6 +117,8 @@ public final class Task implements Writable{
 			entrys.addAll(cite.entrySet());
 			HashMap<String,Object> uniqueMap = new HashMap<String,Object>();
 			uniqueMap.put("_unique", unique);
+			uniqueMap.put("_sendrequest", sendRequest);
+			uniqueMap.put("_tag", tag);
 			entrys.addAll(uniqueMap.entrySet());
 			return entrys;
 		}
@@ -123,6 +133,14 @@ public final class Task implements Writable{
 		
 		public String getUnique(int index){
 			return unique.get(index);
+		}
+		
+		public String getSendRequest(){
+			return sendRequest;
+		}
+		
+		public String getTag(){
+			return tag;
 		}
 		
 	}
