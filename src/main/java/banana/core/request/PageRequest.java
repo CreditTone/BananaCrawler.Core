@@ -24,7 +24,7 @@ public final class PageRequest extends HttpRequest{
     
     
     
-    protected PageRequest(){
+    public PageRequest(){
     	type = type.PAGE_REQUEST;
     	method = Method.GET;
     }

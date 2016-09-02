@@ -84,7 +84,7 @@ public final class StartContext extends BytesWritable{
      * 使用usePageEncoding。则默认用UTF-8编码
      * @return PageRequest
      */
-    public  static PageRequest createPageRequest(String url,String processor,int priority,PageEncoding pageEncoding){
+    public static PageRequest createPageRequest(String url,String processor,int priority,PageEncoding pageEncoding){
     	if(priority >=0 && priority<=1000){
     		PageRequest req = new PageRequest();
         	req.setUrl(url);
@@ -96,6 +96,13 @@ public final class StartContext extends BytesWritable{
     	}else{
     		throw new IllegalArgumentException("priority的值必须在0-1000之间");
     	}
+    }
+    
+    
+    public static PageRequest createPageRequest(byte[] body){
+    	PageRequest req = new PageRequest();
+    	req.load(body);
+    	return req;
     }
     
     /**

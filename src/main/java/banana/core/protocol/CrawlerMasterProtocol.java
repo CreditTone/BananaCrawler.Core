@@ -20,6 +20,8 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	void submitTask(Task config) throws Exception;
 	
+	void stopTask(String taskname) throws Exception;
+	
 	BooleanWritable existTask(String taskname);
 	
 	BooleanWritable taskdataExists(String collection,String taskname);
