@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -179,6 +180,11 @@ public class DelayedBlockingQueue implements BlockingRequestQueue,Serializable {
 			}
 		}
 		return qdata;
+	}
+
+	@Override
+	public Iterator<HttpRequest> iterator() {
+		return queue.iterator();
 	}
 	
 }

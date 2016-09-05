@@ -1,6 +1,7 @@
 package banana.core.queue;
 
 import java.io.InputStream;
+import java.util.Iterator;
 
 import banana.core.request.HttpRequest;
 
@@ -70,5 +71,7 @@ public interface BlockingRequestQueue {
 	public byte[] toBytes();
 	
 	public void load(InputStream input);
+	
+	public Iterator<HttpRequest> iterator();
 	
 }

@@ -3,9 +3,14 @@ package banana.core.request;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 import com.alibaba.fastjson.JSON;
 
@@ -49,9 +54,15 @@ public abstract class HttpRequest extends AttributeRequest {
 			throw new NullPointerException();
 		} else {
 			this.url = url;
+			List<NameValuePair> pair = URLEncodedUtils.parse(url, Charset.forName("UTF-8"));
+			if (pair != null){
+				for (NameValuePair pr : pair) {
+					addAttribute(pr.getName(), pr.getValue());
+				}
+			}
 		}
 	}
-
+	
 	public Method getMethod() {
 		return method;
 	}

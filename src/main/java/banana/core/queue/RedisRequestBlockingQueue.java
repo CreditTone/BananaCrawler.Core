@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -493,6 +494,12 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 			}
 		}
 		return qdata;
+	}
+
+
+	@Override
+	public Iterator<HttpRequest> iterator() {
+		return null;
 	}
 	
 }

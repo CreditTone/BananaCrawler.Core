@@ -29,7 +29,7 @@ public class CountableThreadPool implements Closeable{
 	    }
 
 	    public int getThreadAlive() {
-	        return threadAlive.get();
+	        return executorService.getActiveCount();
 	    }
 
 	    public int getThreadNum() {

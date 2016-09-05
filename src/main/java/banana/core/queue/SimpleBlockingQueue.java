@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -90,6 +91,10 @@ public class SimpleBlockingQueue extends LinkedBlockingQueue<HttpRequest> implem
 			}
 		}
 		return qdata;
+	}
+	
+	public Iterator<HttpRequest> iterator(){
+		return super.iterator();
 	}
 	
 }
