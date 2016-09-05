@@ -84,4 +84,13 @@ public final class SystemUtil {
 		}
 		return buf;
 	}
+	
+	public static final byte[] intToBytes(int x){
+		byte[] dataLength = new byte[4];
+		dataLength[0] = (byte)((x >> 24) & 0xFF);
+		dataLength[1] = (byte)((x >> 16) & 0xFF);
+		dataLength[2] = (byte)((x >> 8) & 0xFF); 
+		dataLength[3] = (byte)(x & 0xFF);
+		return dataLength;
+	}
 }

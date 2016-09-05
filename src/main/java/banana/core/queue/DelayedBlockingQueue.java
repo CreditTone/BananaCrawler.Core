@@ -1,5 +1,6 @@
 package banana.core.queue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
+import banana.core.util.SystemUtil;
 
 
 /**
@@ -114,11 +116,6 @@ public class DelayedBlockingQueue implements BlockingRequestQueue,Serializable {
 	public void clear() {
 		queue.clear();
 	}
-
-	@Override
-	public InputStream getStream() {
-		return new QueueInputStream(this);
-	}
 	
 	@Override
 	public void load(InputStream input) {
@@ -155,4 +152,33 @@ public class DelayedBlockingQueue implements BlockingRequestQueue,Serializable {
 			}
 		}
 	}
+
+	@Override
+	public byte[] toBytes() {
+		byte[] qdata = null;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try{
+			HttpRequest req = queue.poll();
+			byte[] data = null;
+			while(req != null){
+				data = req.toBytes();
+				out.write(SystemUtil.intToBytes(data.length));
+				out.write(data);
+				req = queue.poll();
+			}
+			qdata = out.toByteArray();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if (out != null){
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return qdata;
+	}
+	
 }

@@ -67,11 +67,7 @@ public interface BlockingRequestQueue {
 	 */
 	public void clear();
 	
-	/**
-	 * 将队列数据作为流导出
-	 * @return
-	 */
-	public InputStream getStream();
+	public byte[] toBytes();
 	
 	public void load(InputStream input);
 	

@@ -1,5 +1,6 @@
 package banana.core.queue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -25,6 +26,7 @@ import banana.core.request.BasicRequest;
 import banana.core.request.BinaryRequest;
 import banana.core.request.PageRequest;
 import banana.core.request.TransactionRequest;
+import banana.core.util.SystemUtil;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -429,11 +431,6 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 
 
 	@Override
-	public InputStream getStream() {
-		return new QueueInputStream(this);
-	}
-
-	@Override
 	public void load(InputStream input) {
 		DataInputStream dataInput = new DataInputStream(input);
 		try{
@@ -468,4 +465,34 @@ public final class RedisRequestBlockingQueue implements BlockingRequestQueue,Clo
 			}
 		}
 	}
+
+
+	@Override
+	public byte[] toBytes() {
+		byte[] qdata = null;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try{
+			HttpRequest req = poll();
+			byte[] data = null;
+			while(req != null){
+				data = req.toBytes();
+				out.write(SystemUtil.intToBytes(data.length));
+				out.write(data);
+				req = poll();
+			}
+			qdata = out.toByteArray();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if (out != null){
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return qdata;
+	}
+	
 }

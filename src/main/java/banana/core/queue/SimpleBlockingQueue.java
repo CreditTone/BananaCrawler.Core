@@ -1,5 +1,6 @@
 package banana.core.queue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -8,9 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 import banana.core.request.HttpRequest;
-import banana.core.request.HttpRequest.Method;
 import banana.core.request.PageRequest;
-import banana.core.request.StartContext;
+import banana.core.util.SystemUtil;
 
 /**
  * SimpleBlockingQueue采用先进先出的FIFO原则。广度优先策略合适的队列
@@ -26,11 +26,6 @@ public class SimpleBlockingQueue extends LinkedBlockingQueue<HttpRequest> implem
 	@Override
 	public boolean remove(HttpRequest e) {
 		return super.remove(e);
-	}
-
-	@Override
-	public InputStream getStream() {
-		return new QueueInputStream(this);
 	}
 
 	@Override
@@ -67,6 +62,34 @@ public class SimpleBlockingQueue extends LinkedBlockingQueue<HttpRequest> implem
 				}
 			}
 		}
+	}
+
+	@Override
+	public byte[] toBytes() {
+		byte[] qdata = null;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try{
+			HttpRequest req = poll();
+			byte[] data = null;
+			while(req != null){
+				data = req.toBytes();
+				out.write(SystemUtil.intToBytes(data.length));
+				out.write(data);
+				req = poll();
+			}
+			qdata = out.toByteArray();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			if (out != null){
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return qdata;
 	}
 	
 }
