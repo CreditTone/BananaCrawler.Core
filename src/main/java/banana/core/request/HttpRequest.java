@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.alibaba.fastjson.JSON;
 
@@ -54,12 +55,6 @@ public abstract class HttpRequest extends AttributeRequest {
 			throw new NullPointerException();
 		} else {
 			this.url = url;
-			List<NameValuePair> pair = URLEncodedUtils.parse(url, Charset.forName("UTF-8"));
-			if (pair != null){
-				for (NameValuePair pr : pair) {
-					addAttribute(pr.getName(), pr.getValue());
-				}
-			}
 		}
 	}
 	
@@ -108,6 +103,16 @@ public abstract class HttpRequest extends AttributeRequest {
 	public Map<String, String> getHedaers() {
 		iniHeadersContainer();
 		return this.headers;
+	}
+	
+	public List<NameValuePair> getNameValuePairs(){
+		List<NameValuePair> pair = URLEncodedUtils.parse(url, Charset.defaultCharset());
+		if (requestParams != null && method == HttpRequest.Method.POST){
+			for (Entry<String,String> entry : getParams()) {
+				pair.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
+			}
+		}
+		return pair;
 	}
 
 	public String getProcessor() {

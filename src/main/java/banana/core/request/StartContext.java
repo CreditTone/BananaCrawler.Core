@@ -71,6 +71,7 @@ public final class StartContext extends BytesWritable{
     	req.setUrl(url);
     	req.setMethod(Method.GET);
     	req.setProcessor(processor);
+    	req.setPriority(1);
     	return req;
     }
     

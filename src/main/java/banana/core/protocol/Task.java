@@ -22,6 +22,8 @@ public final class Task implements Writable{
 		
 		protected String url;
 		
+		protected String[] urls;
+		
 		protected String method;
 		
 		protected Map<String,String> headers;
@@ -29,6 +31,14 @@ public final class Task implements Writable{
 		protected Map<String,String> params;
 		
 		protected String processor;
+
+		public String[] getUrls() {
+			return urls;
+		}
+
+		public void setUrls(String[] urls) {
+			this.urls = urls;
+		}
 
 		public String getUrl() {
 			return url;
@@ -255,7 +265,7 @@ public final class Task implements Writable{
 			throw new Exception("There is no seed");
 		}
 		for (Seed seed : seeds) {
-			if (seed.url == null){
+			if (seed.url == null && seed.urls == null){
 				throw new NullPointerException("seed url cannot be null");
 			}
 			if (seed.processor == null){
