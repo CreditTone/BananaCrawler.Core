@@ -1,9 +1,5 @@
 package banana.core.request;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 /**
  * 文件下载类型Request的表示
  *

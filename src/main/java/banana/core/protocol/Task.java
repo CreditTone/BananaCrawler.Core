@@ -83,20 +83,20 @@ public final class Task implements Writable{
 	
 	public static class ExpandableHashMap extends HashMap<String,Object>{
 		
-		private String tag = null;
+		public String tag = null;
 		
-		private String sendRequest = null;
+		public HashSet<String> sendRequest = null;
 		
-		private List<String> unique = null;
+		public List<String> unique = null;
 
-		private HashMap<String,Object> cite = new HashMap<String,Object>();
+		public HashMap<String,Object> cite = new HashMap<String,Object>();
 		
 		@Override
 		public Object put(String key, Object value) {
 			if (key.equals("_tag")){
 				tag = (String) value;
 			}else if (key.equals("_sendrequest")){
-				sendRequest = (String) value;
+				sendRequest = new HashSet<String>((Collection<? extends String>) value);
 			}else if (key.equals("_unique")){
 				unique = (List<String>) value;
 				return value;
@@ -145,7 +145,7 @@ public final class Task implements Writable{
 			return unique.get(index);
 		}
 		
-		public String getSendRequest(){
+		public HashSet<String> getSendRequest(){
 			return sendRequest;
 		}
 		
@@ -158,6 +158,39 @@ public final class Task implements Writable{
 	public static final class CrawlerRequest extends ExpandableHashMap{}
 	
 	public static final class CrawlerData extends ExpandableHashMap{}
+	
+	public static final class ProcessorForwarder {
+		
+		private String index;
+		
+		private Map<String,String>[] selector;
+		
+		private Map<String,Object> page_context;
+
+		public String getIndex() {
+			return index;
+		}
+
+		public void setIndex(String index) {
+			this.index = index;
+		}
+
+		public Map<String, String>[] getSelector() {
+			return selector;
+		}
+
+		public void setSelector(Map<String, String>[] selector) {
+			this.selector = selector;
+		}
+
+		public Map<String, Object> getPage_context() {
+			return page_context;
+		}
+
+		public void setPage_context(Map<String, Object> page_context) {
+			this.page_context = page_context;
+		}
+	}
 	
 	public static final class ContentProcessor{
 		
@@ -308,6 +341,8 @@ public final class Task implements Writable{
 	 */
 	public List<Seed> seeds;
 	
+	public List<ProcessorForwarder> forwarders;
+	
 	/**
 	 * 页面处理器
 	 */
@@ -327,10 +362,12 @@ public final class Task implements Writable{
 		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds);
+		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
 		String processorJson = JSON.toJSONString(processors);
 		out.writeUTF(filterJson);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
+		out.writeUTF(forwarderJson);
 		out.writeUTF(processorJson);
 	}
 
@@ -344,6 +381,7 @@ public final class Task implements Writable{
 		String filterJson = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
+		String forwarderJson = in.readUTF();
 		String processorJson = in.readUTF();
 		
 		filter = JSON.parseObject(filterJson, Filter.class);
@@ -356,6 +394,15 @@ public final class Task implements Writable{
 			Seed seed = JSON.parseObject(array.getJSONObject(i).toString(), Seed.class);
 			seeds.add(seed);
 		}
+		
+		forwarders = new ArrayList<ProcessorForwarder>();
+		array = JSONArray.parseArray(forwarderJson);
+		for (int i = 0; i < array.size(); i++) {
+			ProcessorForwarder proforwarder = JSON.parseObject(array.getJSONObject(i).toString(), ProcessorForwarder.class);
+			forwarders.add(proforwarder);
+		}
+		
+		
 		processors = new ArrayList<Processor>();
 		array = JSONArray.parseArray(processorJson);
 		for (int i = 0; i < array.size(); i++) {

@@ -24,6 +24,7 @@ import com.mongodb.gridfs.GridFSInputFile;
 
 import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
+import banana.core.request.RequestBuilder;
 import banana.core.request.StartContext;
 import banana.core.util.SystemUtil;
 
@@ -180,7 +181,7 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 		DelayedPriorityBlockingQueue queue = new DelayedPriorityBlockingQueue(1000);
 		StartContext context = new StartContext();
 		for (int i = 0; i < 100; i++) {
-			PageRequest req = context.createPageRequest("http://www.hao123.com", "123");
+			PageRequest req = RequestBuilder.createPageRequest("http://www.hao123.com", "123");
 			JSONObject obj = new JSONObject();
 			obj.put("aaa", "bbb");
 			req.addAttribute("a", "b"+i);

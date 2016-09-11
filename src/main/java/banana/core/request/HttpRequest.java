@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,8 +107,13 @@ public abstract class HttpRequest extends AttributeRequest {
 	}
 	
 	public List<NameValuePair> getNameValuePairs(){
-		List<NameValuePair> pair = URLEncodedUtils.parse(url, Charset.defaultCharset());
-		if (requestParams != null && method == HttpRequest.Method.POST){
+		if (!url.contains("?")){
+			return new ArrayList<NameValuePair>();
+		}
+		String[] urlData  = url.split("\\?");
+		String querys = urlData[1];
+		List<NameValuePair> pair = URLEncodedUtils.parse(querys, Charset.defaultCharset());
+		if (method == HttpRequest.Method.POST){
 			for (Entry<String,String> entry : getParams()) {
 				pair.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
 			}
@@ -124,6 +130,27 @@ public abstract class HttpRequest extends AttributeRequest {
 			throw new NullPointerException("Processor不能为Null");
 		} else {
 			this.processor = processorCls;
+		}
+	}
+	
+	public void baseRequest(HttpRequest baseRequest){
+		for (String key : baseRequest.enumAttributeNames()) {
+			addAttribute(key, baseRequest.getAttribute(key));
+		}
+		if (url.startsWith("http")){
+			return;
+		}
+		if (url.startsWith("?")){
+			String baseUrl = baseRequest.getUrl().split("\\?", 2)[0];
+			setUrl(baseUrl + url);
+		}else if (url.startsWith("//")){
+			setUrl("https:" + url);
+		}else if(url.startsWith("/")){
+			int index = baseRequest.getUrl().indexOf("/",7);
+			String baseUrl = baseRequest.getUrl().substring(0, index);
+			setUrl(baseUrl + url);
+		}else{
+			setUrl(baseRequest.getUrl() + url);
 		}
 	}
 
