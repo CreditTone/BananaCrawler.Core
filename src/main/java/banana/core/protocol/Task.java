@@ -159,39 +159,6 @@ public final class Task implements Writable{
 	
 	public static final class CrawlerData extends ExpandableHashMap{}
 	
-	public static final class ProcessorForwarder {
-		
-		private String index;
-		
-		private Map<String,String>[] selector;
-		
-		private Map<String,Object> page_context;
-
-		public String getIndex() {
-			return index;
-		}
-
-		public void setIndex(String index) {
-			this.index = index;
-		}
-
-		public Map<String, String>[] getSelector() {
-			return selector;
-		}
-
-		public void setSelector(Map<String, String>[] selector) {
-			this.selector = selector;
-		}
-
-		public Map<String, Object> getPage_context() {
-			return page_context;
-		}
-
-		public void setPage_context(Map<String, Object> page_context) {
-			this.page_context = page_context;
-		}
-	}
-	
 	public static final class ContentProcessor{
 		
 		public List<String> direct;
@@ -200,69 +167,30 @@ public final class Task implements Writable{
 		
 	}
 	
-	public static final class Processor {
+	public static class BasicProcessor {
 		
-		private String index;
+		public String index;
 		
-		private ContentProcessor content;
+		public ContentProcessor	  content_prepare;
 		
-		private Map<String,Object> page_context;
+		public Map<String,Object> page_context;
 		
-		private Map<String,Object> task_context;
+		public Map<String,Object> task_context;
 		
-		private CrawlerRequest[] crawler_request;
+	}
+	
+	public static final class Processor extends BasicProcessor {
 		
-		private CrawlerData[] crawler_data;
+		public CrawlerRequest[] crawler_request;
 		
+		public CrawlerData[] crawler_data;
 
-		public String getIndex() {
-			return index;
-		}
-
-		public void setIndex(String index) {
-			this.index = index;
-		}
+	}
+	
+	public static final class ProcessorForwarder extends BasicProcessor {
 		
-		public ContentProcessor getContent() {
-			return content;
-		}
-
-		public void setContent(ContentProcessor content) {
-			this.content = content;
-		}
-
-		public Map<String, Object> getPage_context() {
-			return page_context;
-		}
-
-		public void setPage_context(Map<String, Object> page_context) {
-			this.page_context = page_context;
-		}
-
-		public Map<String, Object> getTask_context() {
-			return task_context;
-		}
-
-		public void setTask_context(Map<String, Object> task_context) {
-			this.task_context = task_context;
-		}
-
-		public CrawlerRequest[] getCrawler_request() {
-			return crawler_request;
-		}
-
-		public void setCrawler_request(CrawlerRequest[] crawler_request) {
-			this.crawler_request = crawler_request;
-		}
-
-		public CrawlerData[] getCrawler_data() {
-			return crawler_data;
-		}
-
-		public void setCrawler_data(CrawlerData[] crawler_data) {
-			this.crawler_data = crawler_data;
-		}
-
+		public Map<String,String>[] selector;
+		
 	}
 	
 	public static final class Filter{

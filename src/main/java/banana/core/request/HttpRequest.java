@@ -107,11 +107,11 @@ public abstract class HttpRequest extends AttributeRequest {
 	}
 	
 	public List<NameValuePair> getNameValuePairs(){
-		if (!url.contains("?")){
+		if (method == Method.GET && !url.contains("?")){
 			return new ArrayList<NameValuePair>();
 		}
 		String[] urlData  = url.split("\\?");
-		String querys = urlData[1];
+		String querys = urlData.length > 1 ? urlData[1]:urlData[0];
 		List<NameValuePair> pair = URLEncodedUtils.parse(querys, Charset.defaultCharset());
 		if (method == HttpRequest.Method.POST){
 			for (Entry<String,String> entry : getParams()) {
@@ -141,8 +141,8 @@ public abstract class HttpRequest extends AttributeRequest {
 			return;
 		}
 		if (url.startsWith("?")){
-			String baseUrl = baseRequest.getUrl().split("\\?", 2)[0];
-			setUrl(baseUrl + url);
+			String path = baseRequest.getUrl().split("\\?", 2)[0];
+			setUrl(path + url);
 		}else if (url.startsWith("//")){
 			setUrl("https:" + url);
 		}else if(url.startsWith("/")){
@@ -150,7 +150,9 @@ public abstract class HttpRequest extends AttributeRequest {
 			String baseUrl = baseRequest.getUrl().substring(0, index);
 			setUrl(baseUrl + url);
 		}else{
-			setUrl(baseRequest.getUrl() + url);
+			int index = baseRequest.getUrl().indexOf("/",7);
+			String baseUrl = baseRequest.getUrl().substring(0, index+1);
+			setUrl(baseUrl + url);
 		}
 	}
 
