@@ -11,10 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.alibaba.fastjson.JSON;
+
+import banana.core.util.URLEncodedUtils;
 
 import java.util.Map.Entry;
 
@@ -112,7 +113,7 @@ public abstract class HttpRequest extends AttributeRequest {
 		}
 		String[] urlData  = url.split("\\?");
 		String querys = urlData.length > 1 ? urlData[1]:urlData[0];
-		List<NameValuePair> pair = URLEncodedUtils.parse(querys, Charset.defaultCharset());
+		List<NameValuePair> pair = URLEncodedUtils.parse(querys);
 		if (method == HttpRequest.Method.POST){
 			for (Entry<String,String> entry : getParams()) {
 				pair.add(new BasicNameValuePair(entry.getKey(),entry.getValue()));
