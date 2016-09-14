@@ -47,5 +47,11 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.15</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.github.jknack/handlebars -->
+		<dependency>
+			<groupId>com.github.jknack</groupId>
+			<artifactId>handlebars</artifactId>
+			<version>4.0.6</version>
+		</dependency>
 	</dependencies>
 </project>
