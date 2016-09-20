@@ -60,6 +60,9 @@ public class ExpandHandlebars extends Handlebars {
 
 			public Object apply(Object context, Options options) throws IOException {
 				float p0 = Float.parseFloat(((Object)options.param(0)).toString());
+				if (options.param(1) == null){
+					return false;
+				}
 				float p1 = Float.parseFloat(((Object)options.param(1)).toString());
 				return p0 > p1;
 			}
@@ -68,6 +71,9 @@ public class ExpandHandlebars extends Handlebars {
 
 			public Object apply(Object context, Options options) throws IOException {
 				float p0 = Float.parseFloat(((Object)options.param(0)).toString());
+				if (options.param(1) == null){
+					return false;
+				}
 				float p1 = Float.parseFloat(((Object)options.param(1)).toString());
 				return p0 < p1;
 			}
@@ -99,8 +105,8 @@ public class ExpandHandlebars extends Handlebars {
 						}
 					}
 				}
+				baseUrl += "?";
 				if (!pair.isEmpty()){
-					baseUrl += "?";
 					Iterator<NameValuePair> iter = pair.iterator();
 					NameValuePair nvPair = null;
 					while(iter.hasNext()){

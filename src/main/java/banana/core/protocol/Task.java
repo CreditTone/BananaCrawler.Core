@@ -35,85 +35,11 @@ public final class Task implements Writable{
 		public String processor;
 	}
 	
-	public static class ExpandableHashMap extends HashMap<String,Object>{
-		
-		public String tag = null;
-		
-		public HashSet<String> sendRequest = null;
-		
-		public List<String> unique = null;
-
-		public HashMap<String,Object> cite = new HashMap<String,Object>();
-		
-		@Override
-		public Object put(String key, Object value) {
-			if (key.equals("_tag")){
-				tag = (String) value;
-			}else if (key.equals("_sendrequest")){
-				sendRequest = new HashSet<String>((Collection<? extends String>) value);
-			}else if (key.equals("_unique")){
-				unique = (List<String>) value;
-				return value;
-			}else if (key.startsWith("_")){
-				return super.put(key, value);
-			}
-			if (value instanceof String 
-				&& value.toString().contains("{{")
-				&& value.toString().contains("}}")){
-				String valueString = (String) value;
-				cite.put(key, valueString);
-				return valueString;
-			}
-			return super.put(key, value);
-		}
-
-		@Override
-		public void putAll(Map<? extends String, ? extends Object> m) {
-			for (Entry<? extends String, ? extends Object> entry : m.entrySet()) {
-				put(entry.getKey(), entry.getValue());
-			}
-		}
-		
-		
-		@Override
-		public Set<Entry<String, Object>> entrySet() {
-			Set<Entry<String, Object>> entrys = new HashSet<Entry<String, Object>>(super.entrySet());
-			entrys.addAll(cite.entrySet());
-			HashMap<String,Object> uniqueMap = new HashMap<String,Object>();
-			uniqueMap.put("_unique", unique);
-			uniqueMap.put("_sendrequest", sendRequest);
-			uniqueMap.put("_tag", tag);
-			entrys.addAll(uniqueMap.entrySet());
-			return entrys;
-		}
-
-		public HashMap<String, Object> getCite() {
-			return cite;
-		}
-		
-		public Collection<String> getUnique(){
-			return unique;
-		}
-		
-		public String getUnique(int index){
-			return unique.get(index);
-		}
-		
-		public HashSet<String> getSendRequest(){
-			return sendRequest;
-		}
-		
-		public String getTag(){
-			return tag;
-		}
-		
-	}
+	public static final class CrawlerRequest extends HashMap{}
 	
-	public static final class CrawlerRequest extends ExpandableHashMap{}
+	public static final class CrawlerData extends HashMap{}
 	
-	public static final class CrawlerData extends ExpandableHashMap{}
-	
-	public static final class ContentProcessor{
+	public static final class ContentPrepare{
 		
 		public List<String> direct;
 		
@@ -125,7 +51,7 @@ public final class Task implements Writable{
 		
 		public String index;
 		
-		public ContentProcessor	  content_prepare;
+		public ContentPrepare content_prepare;
 		
 		public Map<String,Object> page_context;
 		
