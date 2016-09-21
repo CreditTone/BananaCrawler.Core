@@ -35,6 +35,24 @@ public final class Task implements Writable{
 		public String processor;
 	}
 	
+	public static class SeedGenerator{
+		
+		public HashMap<String,Object> find;
+		
+		public boolean keep;
+		
+		public String url;
+		
+		public String processor;
+		
+		public String method;
+		
+		public Map<String,String> headers;
+		
+		public Map<String,String> params;
+		
+	}
+	
 	public static final class CrawlerRequest extends HashMap{}
 	
 	public static final class CrawlerData extends HashMap{}
@@ -102,18 +120,25 @@ public final class Task implements Writable{
 			}
 			indexs.add(processor.index);
 		}
-		if (seeds.isEmpty()){
+		if (seed_generator == null || seeds == null || seeds.isEmpty()){
 			throw new Exception("There is no seed");
 		}
-		for (Seed seed : seeds) {
-			if (seed.url == null && seed.urls == null && seed.url_iterator == null){
-				throw new NullPointerException("seed url cannot be null");
+		if (seed_generator != null){
+			if (!indexs.contains(seed_generator.processor)){
+				throw new IllegalArgumentException("processor " + seed_generator.processor + " does not exist");
 			}
-			if (seed.processor == null){
-				throw new NullPointerException("seed processor cannot be null");
-			}
-			if (!indexs.contains(seed.processor)){
-				throw new IllegalArgumentException("processor " + seed.processor + " does not exist");
+		}
+		if (seeds != null){
+			for (Seed seed : seeds) {
+				if (seed.url == null && seed.urls == null && seed.url_iterator == null){
+					throw new NullPointerException("seed url cannot be null");
+				}
+				if (seed.processor == null){
+					throw new NullPointerException("seed processor cannot be null");
+				}
+				if (!indexs.contains(seed.processor)){
+					throw new IllegalArgumentException("processor " + seed.processor + " does not exist");
+				}
 			}
 		}
 		if (thread <= 0){
@@ -149,6 +174,8 @@ public final class Task implements Writable{
 	 */
 	public List<Seed> seeds;
 	
+	public SeedGenerator seed_generator;
+	
 	public List<ProcessorForwarder> forwarders;
 	
 	/**
@@ -169,12 +196,14 @@ public final class Task implements Writable{
 		out.writeBoolean(synchronizeStat);
 		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
-		String seedJson = JSON.toJSONString(seeds);
+		String seedJson = JSON.toJSONString(seeds == null?new ArrayList<Seed>():seeds);
+		String seedGeneratorJson = seed_generator == null?"{}":JSON.toJSONString(seed_generator);
 		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
 		String processorJson = JSON.toJSONString(processors);
 		out.writeUTF(filterJson);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
+		out.writeUTF(seedGeneratorJson);
 		out.writeUTF(forwarderJson);
 		out.writeUTF(processorJson);
 	}
@@ -189,6 +218,7 @@ public final class Task implements Writable{
 		String filterJson = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
+		String seedGeneratorJson = in.readUTF();
 		String forwarderJson = in.readUTF();
 		String processorJson = in.readUTF();
 		
@@ -203,13 +233,16 @@ public final class Task implements Writable{
 			seeds.add(seed);
 		}
 		
+		if (!seedGeneratorJson.equals("{}")){
+			seed_generator = JSON.parseObject(seedGeneratorJson, SeedGenerator.class);
+		}
+		
 		forwarders = new ArrayList<ProcessorForwarder>();
 		array = JSONArray.parseArray(forwarderJson);
 		for (int i = 0; i < array.size(); i++) {
 			ProcessorForwarder proforwarder = JSON.parseObject(array.getJSONObject(i).toString(), ProcessorForwarder.class);
 			forwarders.add(proforwarder);
 		}
-		
 		
 		processors = new ArrayList<Processor>();
 		array = JSONArray.parseArray(processorJson);
@@ -218,7 +251,6 @@ public final class Task implements Writable{
 			processors.add(processor);
 		}
 	}
-	
 	
 }
 

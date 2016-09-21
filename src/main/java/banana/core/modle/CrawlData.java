@@ -2,6 +2,7 @@ package banana.core.modle;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -24,19 +25,27 @@ public class CrawlData implements Serializable{
 	private Date crawlTime;
 	
 	private DBObject data;
+	
+	private DBObject updateQuery;
 
-	public CrawlData(String taskId, String link, String data) {
+	public CrawlData(String taskId, String link, DBObject data) {
+		this(taskId, link, data, null);
+	}
+	
+	public CrawlData(String taskId, String link, DBObject data,DBObject updateQuery) {
 		super();
 		this.taskId = taskId;
 		this.taskName = taskId.split("_")[0];
 		this.link = link;
-		this.data = (DBObject) JSON.parse(data);
+		this.data = data;
+		this.updateQuery = updateQuery;
 		this.crawlTime = new Date();
 		this.data.put("_task_id", taskId);
 		this.data.put("_task_name", taskName);
 		this.data.put("_link", link);
 		this.data.put("_crawl_time", crawlTime);
 	}
+	
 
 	public String getTaskId() {
 		return taskId;
@@ -56,6 +65,14 @@ public class CrawlData implements Serializable{
 	
 	public String getTaskName() {
 		return taskName;
+	}
+	
+	public DBObject getUpdateQuery() {
+		return updateQuery;
+	}
+
+	public boolean isUpdate(){
+		return updateQuery != null;
 	}
 
 	@Override
