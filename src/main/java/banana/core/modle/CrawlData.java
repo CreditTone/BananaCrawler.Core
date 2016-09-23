@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryOperators;
 import com.mongodb.util.JSON;
 
 
@@ -37,13 +38,13 @@ public class CrawlData implements Serializable{
 		this.taskId = taskId;
 		this.taskName = taskId.split("_")[0];
 		this.link = link;
-		this.data = data;
-		this.updateQuery = updateQuery;
 		this.crawlTime = new Date();
-		this.data.put("_task_id", taskId);
-		this.data.put("_task_name", taskName);
-		this.data.put("_link", link);
-		this.data.put("_crawl_time", crawlTime);
+		this.updateQuery = updateQuery;
+		this.data = updateQuery == null?data:new BasicDBObject("$set", data);
+		data.put("_task_id", taskId);
+		data.put("_task_name", taskName);
+		data.put("_link", link);
+		data.put("_crawl_time", crawlTime);
 	}
 	
 

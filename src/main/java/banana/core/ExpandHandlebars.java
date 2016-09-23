@@ -1,7 +1,6 @@
 package banana.core;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -156,6 +155,17 @@ public class ExpandHandlebars extends Handlebars {
 		});
 	}
 	
+	public Template compileEscapeInline(String input) throws IOException {
+		return new EscapeTemplate(super.compileInline(input));
+	}
+	
+	public String escapeParse(String input,Map<String,Object> context) throws IOException{
+		Template template = compileEscapeInline(input);
+		return template.apply(context);
+		
+	}
+	
+
 	public List<Map<String,Object>> toFor(Map<String,Object> iterDef) throws IOException{
 		iterDef = new HashMap<String,Object>(iterDef);
 		String forDef = (String) iterDef.remove("for");

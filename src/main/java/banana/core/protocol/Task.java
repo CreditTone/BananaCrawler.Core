@@ -82,7 +82,7 @@ public final class Task implements Writable{
 		public CrawlerRequest[] crawler_request;
 		
 		public CrawlerData[] crawler_data;
-
+		
 	}
 	
 	public static final class ProcessorForwarder extends BasicProcessor {
@@ -120,7 +120,7 @@ public final class Task implements Writable{
 			}
 			indexs.add(processor.index);
 		}
-		if (seed_generator == null || seeds == null || seeds.isEmpty()){
+		if (seed_generator == null && (seeds == null || seeds.isEmpty())){
 			throw new Exception("There is no seed");
 		}
 		if (seed_generator != null){
