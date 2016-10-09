@@ -95,6 +95,8 @@ public final class Task implements Writable{
 		
 		public String type;
 		
+		public String key_name;
+		
 		public HashSet<String>  target;
 
 	}
@@ -185,7 +187,7 @@ public final class Task implements Writable{
 	
 	public String data;
 	
-	public boolean synchronizeStat;
+	public boolean synchronizeLinks;
 
 	@Override
 	public void write(DataOutput out) throws IOException {
@@ -193,7 +195,7 @@ public final class Task implements Writable{
 		out.writeUTF(collection);
 		out.writeInt(thread);
 		out.writeInt(loops);
-		out.writeBoolean(synchronizeStat);
+		out.writeBoolean(synchronizeLinks);
 		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds == null?new ArrayList<Seed>():seeds);
@@ -214,7 +216,7 @@ public final class Task implements Writable{
 		collection = in.readUTF();
 		thread = in.readInt();
 		loops = in.readInt();
-		synchronizeStat = in.readBoolean();
+		synchronizeLinks = in.readBoolean();
 		String filterJson = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
