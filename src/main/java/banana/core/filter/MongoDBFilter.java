@@ -16,12 +16,9 @@ public class MongoDBFilter implements Filter {
 		this.key = key;
 		this.collection = collection;
 		DBCursor cursor = collection.find(new BasicDBObject(), new BasicDBObject(key,1));
-		int c = 0;
 		while (cursor.hasNext()){
 			String value = cursor.next().get(key).toString();
 			bloomFilter.add(value);
-			c++;
-			System.out.println(c);
 		}
 	}
 
