@@ -17,8 +17,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
@@ -69,7 +72,7 @@ public class DefaultPageDownloader extends PageDownloader{
 		try {
 			client = httpClientPool.get();
 			method = buildHttpUriRequest(request);
-			HttpContext httpContext = setProxyIpAndTimeOut(method,timeout);
+			HttpContext httpContext = null;
 			HttpResponse response = client.execute(method,httpContext);
 			statuCode = response.getStatusLine().getStatusCode();
 			//获取网页内容
@@ -101,8 +104,8 @@ public class DefaultPageDownloader extends PageDownloader{
 	}
 	
 	private final HttpContext setProxyIpAndTimeOut(HttpRequestBase method,int timeout){
-		HttpContext httpContext = null;
-		Builder builder = RequestConfig.custom().setSocketTimeout(timeout*1000).setConnectTimeout(timeout*1000);//设置请求和传输超时时间;
+		BasicHttpContext httpContext = new BasicHttpContext();
+		Builder builder = RequestConfig.custom().setSocketTimeout(timeout*1000).setConnectTimeout(timeout*1000).setAuthenticationEnabled(true);//设置请求和传输超时时间;
 //		if(ip != null){
 //			HttpHost proxy = new HttpHost(ip.getIp(),ip.getPort()); 
 //			builder.setProxy(proxy);
@@ -117,7 +120,9 @@ public class DefaultPageDownloader extends PageDownloader{
 //			}
 //			log.info(String.format("set proxy %s", ip.toString()));
 //		}
-		method.setConfig(builder.build());
+		RequestConfig config = builder.build();
+		method.setConfig(config);
+		httpContext.setAttribute(HttpClientContext.REQUEST_CONFIG, config);
 		return httpContext;
 	}
 
@@ -161,7 +166,7 @@ public class DefaultPageDownloader extends PageDownloader{
 		Map<String,String> headers = getFirefoxHeaders();
 		headers.putAll(custom_headers);//覆盖自定义请求头
 		Set<Entry<String, String>> keyValues = headers.entrySet();
-		Builder builder = RequestConfig.custom().setSocketTimeout(10*1000).setConnectTimeout(10*1000).setRedirectsEnabled(false);
+		RequestConfig config = RequestConfig.custom().setSocketTimeout(10*1000).setConnectTimeout(10*1000).setRedirectsEnabled(true).setCircularRedirectsAllowed(true).build();
 		switch(request.getMethod()){
 			case GET:
 				HttpGet get = new HttpGet(request.getUrl());
@@ -169,7 +174,7 @@ public class DefaultPageDownloader extends PageDownloader{
 				for (Entry<String, String> entry : keyValues) {
 					get.setHeader(entry.getKey(), entry.getValue());
 				}
-				get.setConfig(builder.build());
+				get.setConfig(config);
 				return get;
 			case POST:
 				HttpPost post = new HttpPost(request.getUrl());
@@ -187,7 +192,7 @@ public class DefaultPageDownloader extends PageDownloader{
 					}
 					post.setEntity(new UrlEncodedFormEntity(nameValuePairs)); 
 				}
-				post.setConfig(builder.build());
+				post.setConfig(config);
 				return post;
 		}
 		return null;
