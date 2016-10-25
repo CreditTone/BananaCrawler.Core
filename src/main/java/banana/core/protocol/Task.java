@@ -24,6 +24,10 @@ public final class Task implements Writable{
 		
 		public String[] urls;
 		
+		public String download;
+		
+		public String[] downloads;
+		
 		public Map<String,Object> url_iterator;
 		
 		public String method;
@@ -42,6 +46,8 @@ public final class Task implements Writable{
 		public boolean keep;
 		
 		public String url;
+		
+		public String download;
 		
 		public String processor;
 		

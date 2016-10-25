@@ -9,39 +9,37 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpCoreContext;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
-import banana.core.download.PageDownloader;
+import banana.core.download.HttpDownloader;
 import banana.core.download.pool.HttpClientPool;
+import banana.core.request.BinaryRequest;
+import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
 import banana.core.response.Page;
+import banana.core.response.StreamResponse;
 
 
 /**
  * 缺省的PageDownloader使用HttpClient作为下载内核
  */
-public class DefaultPageDownloader extends PageDownloader{
+public class DefaultHttpDownloader extends HttpDownloader{
 
-	private final Logger log = Logger.getLogger(DefaultPageDownloader.class);
+	private final Logger log = Logger.getLogger(DefaultHttpDownloader.class);
+	
 	private int timeout = 15;
 	
 	private volatile HttpClientPool httpClientPool;
 	
-	public DefaultPageDownloader(){}
+	public DefaultHttpDownloader(){}
 	
 	@Override
 	public void close() throws IOException {
@@ -52,21 +50,7 @@ public class DefaultPageDownloader extends PageDownloader{
 
 	@Override
 	public Page download(PageRequest request) {
-		Page page = go(request);
-		return page;
-	}
-	
-	
-	/**
-	 * 去下载
-	 * @param request
-	 * @param task
-	 * @return
-	 * @throws ProxyIpLoseException
-	 */
-	public Page go(PageRequest request){
 		Page  page = null;
-		int statuCode = 0;
 		ZHttpClient client =  null;
 		HttpRequestBase method = null;
 		try {
@@ -74,20 +58,7 @@ public class DefaultPageDownloader extends PageDownloader{
 			method = buildHttpUriRequest(request);
 			HttpContext httpContext = null;
 			HttpResponse response = client.execute(method,httpContext);
-			statuCode = response.getStatusLine().getStatusCode();
-			//获取网页内容
-			String content = EntityUtils.toString(response.getEntity(),request.getPageEncoding().toString());
-			page = new Page();
-			page.setContent(content);
-			page.setStatus(statuCode);
-			page.setRequest(request);
-			page.setContentType(response.getEntity().getContentType().getValue());
-			Header []headers = response.getAllHeaders();
-			Map<String,String> headerCopy = new HashMap<String,String>();
-			for (int i = 0; i < headers.length; i++) {
-				headerCopy.put(headers[i].getName(), headers[i].getValue());
-			}
-			page.setResponseHeader(headerCopy);
+			page = new Page(request,response);
 		} catch (Exception e) {
 			if(e instanceof NullPointerException){
 				throw new RuntimeException(e); 
@@ -103,6 +74,34 @@ public class DefaultPageDownloader extends PageDownloader{
 		return page;
 	}
 	
+	@Override
+	public StreamResponse downloadBinary(BinaryRequest request) {
+		ZHttpClient client =  null;
+		HttpRequestBase method = null;
+		StreamResponse stream = null;
+		try {
+			client = httpClientPool.get();
+			method = buildHttpUriRequest(request);
+			HttpContext httpContext = null;
+			HttpResponse response = client.execute(method,httpContext);
+			stream = new StreamResponse(request,response);
+		} catch (Exception e) {
+			if(e instanceof NullPointerException){
+				throw new RuntimeException(e); 
+			}
+			log.warn("download error " + request.getUrl(),e);
+		}finally {
+			if(method != null){
+				method.abort();
+				method.releaseConnection();
+				httpClientPool.returnToPool(client);
+			}
+		}
+		return stream;
+	}
+	
+	
+	/**
 	private final HttpContext setProxyIpAndTimeOut(HttpRequestBase method,int timeout){
 		BasicHttpContext httpContext = new BasicHttpContext();
 		Builder builder = RequestConfig.custom().setSocketTimeout(timeout*1000).setConnectTimeout(timeout*1000).setAuthenticationEnabled(true);//设置请求和传输超时时间;
@@ -125,12 +124,7 @@ public class DefaultPageDownloader extends PageDownloader{
 		httpContext.setAttribute(HttpClientContext.REQUEST_CONFIG, config);
 		return httpContext;
 	}
-
-	@Override
-	public void setTimeout(int second) {
-		this.timeout = second;
-	}
-	
+**/
 	public void setMaxDriverCount(int drivercount) {
 		checkInit();
 		httpClientPool.setMaxDriverCount(drivercount);
@@ -161,7 +155,7 @@ public class DefaultPageDownloader extends PageDownloader{
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	private final HttpRequestBase buildHttpUriRequest(PageRequest request) throws UnsupportedEncodingException{
+	private final HttpRequestBase buildHttpUriRequest(HttpRequest request) throws UnsupportedEncodingException{
 		Map<String,String> custom_headers = request.getHedaers();
 		Map<String,String> headers = getFirefoxHeaders();
 		headers.putAll(custom_headers);//覆盖自定义请求头
@@ -212,6 +206,13 @@ public class DefaultPageDownloader extends PageDownloader{
 	public boolean supportJavaScript() {
 		return false;
 	}
+
+	@Override
+	public void setTimeout(int second) {
+		this.timeout = second;
+	}
+
+	
 	
 	
 }

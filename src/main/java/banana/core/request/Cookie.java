@@ -1,13 +1,13 @@
 package banana.core.request;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Date;
-/**
- * Cookie表示类
- * @author 郭钟 
- * @QQ群  202568714
- *
- */
-public class Cookie {
+
+import banana.core.BytesWritable;
+
+public class Cookie extends BytesWritable {
 	private final String name;
 	
 	private final String value;
@@ -136,6 +136,14 @@ public class Cookie {
 		} else if (!value.equals(other.value))
 			return false;
 		return true;
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException {
+	}
+
+	@Override
+	public void readFields(DataInput in) throws IOException {
 	}
 
 	

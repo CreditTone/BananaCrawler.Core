@@ -8,7 +8,7 @@ import org.apache.hadoop.ipc.VersionedProtocol;
 
 
 import banana.core.exception.CrawlerMasterException;
-import banana.core.request.BasicRequest;
+import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
 
 
@@ -37,6 +37,8 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	HttpRequest pollTaskRequest(String taskId) throws CrawlerMasterException;
 	
 	BooleanWritable filterQuery(String taskId,String ... fields);
+	
+	void injectCookies(Cookies cookies,String taskId) throws Exception;
 
 	//Text getStartContextAttribute(String taskname,String hashCode,String attribute) throws java.rmi.RemoteException;
 	

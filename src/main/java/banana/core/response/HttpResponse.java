@@ -1,11 +1,13 @@
 package banana.core.response;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import banana.core.request.BasicRequest;
+import org.apache.http.Header;
+
 import banana.core.request.HttpRequest;
 
-public class BasicResponse {
+public class HttpResponse {
 	
 	protected int statusCode;
 	
@@ -14,6 +16,18 @@ public class BasicResponse {
 	protected Map<String,String> responseHeader;
 	
 	protected HttpRequest basicRequest;
+	
+	public HttpResponse(HttpRequest basicRequest, org.apache.http.HttpResponse response) {
+		setStatus(response.getStatusLine().getStatusCode());
+		setRequest(basicRequest);
+		setContentType(response.getEntity().getContentType().getValue());
+		Header []headers = response.getAllHeaders();
+		Map<String,String> headerCopy = new HashMap<String,String>();
+		for (int i = 0; i < headers.length; i++) {
+			headerCopy.put(headers[i].getName(), headers[i].getValue());
+		}
+		setResponseHeader(headerCopy);
+	}
 	
 	public int getStatus(){
 		return statusCode;

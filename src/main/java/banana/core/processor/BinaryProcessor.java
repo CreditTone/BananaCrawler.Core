@@ -1,9 +1,6 @@
 package banana.core.processor;
 
-import java.io.InputStream;
-import java.util.concurrent.BlockingQueue;
-
-import banana.core.request.BinaryRequest;
+import banana.core.response.StreamResponse;
 
 
 /**
@@ -11,13 +8,6 @@ import banana.core.request.BinaryRequest;
  */
 public interface BinaryProcessor {
 	
-	public abstract String getName();
+	public void process(StreamResponse stream);
 	
-	/**
-	 * 请求文件
-	 * @param binaryRequest
-	 * @param input  文件对应的字节流
-	 * @param requestQueue 
-	 */
-	public void process(BinaryRequest binaryRequest,InputStream input, BlockingQueue<BinaryRequest> requestQueue);
 }

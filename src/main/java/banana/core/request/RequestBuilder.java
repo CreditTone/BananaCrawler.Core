@@ -14,7 +14,7 @@ public final class RequestBuilder {
 	 */
     public static PageRequest createPageRequest(String url,String processor){
     	PageRequest req = new PageRequest();
-    	req.setUrl(url);
+    	req.setUrl(url.replaceAll(" ", "%20"));
     	req.setMethod(Method.GET);
     	req.setProcessor(processor);
     	req.setPriority(1);
