@@ -14,6 +14,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import banana.core.util.URLEncodedUtils;
 
@@ -136,7 +137,13 @@ public abstract class HttpRequest extends AttributeRequest {
 	
 	public void baseRequest(HttpRequest baseRequest){
 		for (String key : baseRequest.enumAttributeNames()) {
-			addAttribute(key, baseRequest.getAttribute(key));
+			Object value = baseRequest.getAttribute(key);
+			if ("_data".equals(key) && attributes.containsKey("_data")){
+				JSONObject data = (JSONObject) attributes.get("_data");
+				data.putAll((Map<? extends String, ? extends Object>) value);
+				value = data;
+			}
+			attributes.put(key, value);
 		}
 		if (url.startsWith("http")){
 			return;

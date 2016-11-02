@@ -39,7 +39,7 @@ public final class Task implements Writable{
 		public String processor;
 	}
 	
-	public static class SeedGenerator{
+	public static class SeedQuery{
 		
 		public HashMap<String,Object> find;
 		
@@ -128,12 +128,12 @@ public final class Task implements Writable{
 			}
 			indexs.add(processor.index);
 		}
-		if (seed_generator == null && (seeds == null || seeds.isEmpty())){
+		if (seed_query == null && (seeds == null || seeds.isEmpty())){
 			throw new Exception("There is no seed");
 		}
-		if (seed_generator != null){
-			if (!indexs.contains(seed_generator.processor)){
-				throw new IllegalArgumentException("processor " + seed_generator.processor + " does not exist");
+		if (seed_query != null){
+			if (!indexs.contains(seed_query.processor)){
+				throw new IllegalArgumentException("processor " + seed_query.processor + " does not exist");
 			}
 		}
 		if (seeds != null){
@@ -182,7 +182,7 @@ public final class Task implements Writable{
 	 */
 	public List<Seed> seeds;
 	
-	public SeedGenerator seed_generator;
+	public SeedQuery seed_query;
 	
 	public List<ProcessorForwarder> forwarders;
 	
@@ -205,7 +205,7 @@ public final class Task implements Writable{
 		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds == null?new ArrayList<Seed>():seeds);
-		String seedGeneratorJson = seed_generator == null?"{}":JSON.toJSONString(seed_generator);
+		String seedGeneratorJson = seed_query == null?"{}":JSON.toJSONString(seed_query);
 		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
 		String processorJson = JSON.toJSONString(processors);
 		out.writeUTF(filterJson);
@@ -242,7 +242,7 @@ public final class Task implements Writable{
 		}
 		
 		if (!seedGeneratorJson.equals("{}")){
-			seed_generator = JSON.parseObject(seedGeneratorJson, SeedGenerator.class);
+			seed_query = JSON.parseObject(seedGeneratorJson, SeedQuery.class);
 		}
 		
 		forwarders = new ArrayList<ProcessorForwarder>();
