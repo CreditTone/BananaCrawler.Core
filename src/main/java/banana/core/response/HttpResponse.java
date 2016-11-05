@@ -17,6 +17,8 @@ public class HttpResponse {
 	
 	protected HttpRequest basicRequest;
 	
+	public HttpResponse(){}
+	
 	public HttpResponse(HttpRequest basicRequest, org.apache.http.HttpResponse response) {
 		setStatus(response.getStatusLine().getStatusCode());
 		setRequest(basicRequest);

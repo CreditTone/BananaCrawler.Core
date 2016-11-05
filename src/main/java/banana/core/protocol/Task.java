@@ -4,7 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +56,14 @@ public final class Task implements Writable{
 		public Map<String,String> headers;
 		
 		public Map<String,String> params;
+		
+	}
+	
+	public static class Timer{
+		
+		public String first_start;
+		
+		public String period;
 		
 	}
 	
@@ -118,6 +126,9 @@ public final class Task implements Writable{
 		}else if(collection.contains("_")){
 			throw new IllegalArgumentException("collection cannot contain underscore symbols");
 		}
+		if (!Arrays.asList("default","phantomjs").contains(downloader)){
+			throw new IllegalArgumentException("downloader " + downloader + " doesn't support");
+		}
 		if (processors == null || processors.isEmpty()){
 			throw new Exception("There is no processors");
 		}
@@ -169,6 +180,8 @@ public final class Task implements Writable{
 	
 	public String collection;
 	
+	public String downloader = "default";
+	
 	public int thread;
 	
 	public int loops;
@@ -183,6 +196,8 @@ public final class Task implements Writable{
 	public List<Seed> seeds;
 	
 	public SeedQuery seed_query;
+	
+	public Timer timer;
 	
 	public List<ProcessorForwarder> forwarders;
 	
@@ -199,19 +214,22 @@ public final class Task implements Writable{
 	public void write(DataOutput out) throws IOException {
 		out.writeUTF(name);
 		out.writeUTF(collection);
+		out.writeUTF(downloader);
 		out.writeInt(thread);
 		out.writeInt(loops);
 		out.writeBoolean(synchronizeLinks);
 		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds == null?new ArrayList<Seed>():seeds);
-		String seedGeneratorJson = seed_query == null?"{}":JSON.toJSONString(seed_query);
+		String seedQueryJson = seed_query == null?"{}":JSON.toJSONString(seed_query);
+		String timerJson = timer == null?"{}":JSON.toJSONString(timer);
 		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
 		String processorJson = JSON.toJSONString(processors);
 		out.writeUTF(filterJson);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
-		out.writeUTF(seedGeneratorJson);
+		out.writeUTF(seedQueryJson);
+		out.writeUTF(timerJson);
 		out.writeUTF(forwarderJson);
 		out.writeUTF(processorJson);
 	}
@@ -220,13 +238,15 @@ public final class Task implements Writable{
 	public void readFields(DataInput in) throws IOException {
 		name = in.readUTF();
 		collection = in.readUTF();
+		downloader = in.readUTF();
 		thread = in.readInt();
 		loops = in.readInt();
 		synchronizeLinks = in.readBoolean();
 		String filterJson = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
-		String seedGeneratorJson = in.readUTF();
+		String seedQueryJson = in.readUTF();
+		String timerJson = in.readUTF();
 		String forwarderJson = in.readUTF();
 		String processorJson = in.readUTF();
 		
@@ -241,8 +261,12 @@ public final class Task implements Writable{
 			seeds.add(seed);
 		}
 		
-		if (!seedGeneratorJson.equals("{}")){
-			seed_query = JSON.parseObject(seedGeneratorJson, SeedQuery.class);
+		if (!seedQueryJson.equals("{}")){
+			seed_query = JSON.parseObject(seedQueryJson, SeedQuery.class);
+		}
+		
+		if (!timerJson.equals("{}")){
+			timer = JSON.parseObject(timerJson, Timer.class);
 		}
 		
 		forwarders = new ArrayList<ProcessorForwarder>();

@@ -1,7 +1,9 @@
 package banana.core;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -129,6 +131,13 @@ public class ExpandHandlebars extends Handlebars {
 					}
 				}
 				return true;
+			}
+		});
+		registerHelper("date", new Helper<Object>() {
+
+			public Object apply(Object context, Options options) throws IOException {
+				String format = options.param(0);
+				return new SimpleDateFormat(format).format(new Date());
 			}
 		});
 		registerHelper("for", new Helper<Object>() {

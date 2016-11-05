@@ -12,6 +12,8 @@ import banana.core.request.PageRequest;
  */
 public class Page extends HttpResponse{
 	
+	public Page(){}
+	
 	public Page(PageRequest basicRequest, org.apache.http.HttpResponse response) throws ParseException, IOException {
 		super(basicRequest, response);
 		String content = EntityUtils.toString(response.getEntity(),basicRequest.getPageEncoding().toString());
