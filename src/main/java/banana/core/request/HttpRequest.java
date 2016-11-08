@@ -3,9 +3,11 @@ package banana.core.request;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +53,21 @@ public abstract class HttpRequest extends AttributeRequest {
 
 	public String getUrl() {
 		return url;
+	}
+	
+	public String getEncodeUrl(){
+		String[] urlData  = url.split("\\?");
+		String querys = urlData.length > 1 ? urlData[1]:urlData[0];
+		String encodeUrl = urlData[0];
+		List<NameValuePair> pairs = URLEncodedUtils.parse(querys);
+		encodeUrl += pairs.isEmpty()?"":"?";
+		Iterator<NameValuePair> iter = pairs.iterator();
+		while(iter.hasNext()){
+			NameValuePair pair = iter.next();
+			encodeUrl += pair.getName() + "=" + URLEncoder.encode(pair.getValue());
+			encodeUrl += iter.hasNext()?"&":"";
+		}
+		return encodeUrl;
 	}
 
 	public void setUrl(String url) {
@@ -122,7 +139,7 @@ public abstract class HttpRequest extends AttributeRequest {
 		}
 		return pair;
 	}
-
+	
 	public String getProcessor() {
 		return processor;
 	}

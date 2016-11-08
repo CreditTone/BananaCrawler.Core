@@ -1,6 +1,7 @@
 package banana.core.download.pool;
 
-import java.io.File;
+
+import java.util.Iterator;
 
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
@@ -15,25 +16,25 @@ public class PhantomJsDriverPool extends DriverPoolInterface<PhantomJSDriver> {
 
 	@Override
 	public void closeAll() {
+		Iterator<PhantomJSDriver> iter = queue.iterator();
+		while(iter.hasNext()){
+			PhantomJSDriver driver = iter.next();
+			driver.quit();
+		}
+		queue.clear();
 	}
 
 	@Override
 	public PhantomJSDriver createDriver() {
 		if (System.getProperty("phantomjs.binary.path") == null){
-			String bin = PhantomJsDriverPool.class.getClass().getResource("").getPath() + "/bin";
-			File file = new File(bin + "/phantomjs");
-			if (file.exists()){
-				System.setProperty("phantomjs.binary.path", bin + "/phantomjs");
-			}else{
-				file = new File(bin + "/phantomjs.exe");
-				if (file.exists()){
-					System.setProperty("phantomjs.binary.path", bin + "/phantomjs.exe");
-				}else{
-					throw new RuntimeException("phantomjs.binary.path error");
-				}
-			}
+			System.setProperty("phantomjs.binary.path", "/Users/stephen/banana/phantomjs-2.1.1-macosx/bin/phantomjs");
 		}
 		return new PhantomJSDriver();
+	}
+
+	@Override
+	public void returnToPool(PhantomJSDriver driver) {
+		queue.add(driver);
 	}
 
 }

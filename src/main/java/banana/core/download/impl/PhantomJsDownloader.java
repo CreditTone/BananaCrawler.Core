@@ -1,5 +1,7 @@
 package banana.core.download.impl;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
@@ -17,19 +19,39 @@ public class PhantomJsDownloader extends DefaultHttpDownloader {
 	@Override
 	public Page download(PageRequest request) {
 		Page page = null;
+		PhantomJSDriver driver = null;
 		try {
-			PhantomJSDriver driver = driverPool.get();
-			driver.get(request.getUrl());
+			driver = driverPool.get();
+			driver.get(request.getEncodeUrl());
 			page = new Page();
-			page.setContent(driver.getPageSource());
+			if (driver.getPageSource().startsWith("<html><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">")){
+				int beginIndex = 84;
+				page.setContent(driver.getPageSource().substring(beginIndex, driver.getPageSource().length()-20));
+			}else{
+				page.setContent(driver.getPageSource());
+			}
 			page.setStatus(200);
 			page.setRequest(request);
 		} catch (InterruptedException e) {
 			logger.warn("download error " + request.getUrl(),e);
+		}finally{
+			if (driver != null){
+				driverPool.returnToPool(driver);
+			}
 		}
 		return page;
 	}
-	
-	
+
+	@Override
+	public void close() throws IOException {
+		super.close();
+		driverPool.closeAll();
+	}
+
+	@Override
+	public void open() {
+		super.open();
+		driverPool.open();
+	}
 	
 }
