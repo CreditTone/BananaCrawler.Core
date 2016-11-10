@@ -3,10 +3,12 @@ package banana.core.request;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.alibaba.fastjson.JSON;
 
 import banana.core.BytesWritable;
 
@@ -24,19 +26,6 @@ public abstract class BasicRequest extends BytesWritable implements Comparable<B
 	protected String uuid = UUID.randomUUID().toString();
 	
 	/**
-	 * 请求类型
-	 * @author Administrator
-	 *
-	 */
-	public enum Type{
-    	PAGE_REQUEST,
-    	TRANSACTION_REQUEST,
-    	BINARY_REQUEST;
-    }
-	
-	protected Type type;
-	
-	/**
      * 父节点的Request
      */
     protected BasicRequest parentRequest;
@@ -48,11 +37,12 @@ public abstract class BasicRequest extends BytesWritable implements Comparable<B
      */
     private int requestCount = 0;
     
+    /**
+     * request属性
+     */
+    protected Map<String,Object> attributes = new HashMap<String, Object>();
+    
 
-	public Type getType() {
-		return type;
-	}
-	 
     public int getPriority() {
 		return 1000 - priority;
 	}
@@ -83,6 +73,27 @@ public abstract class BasicRequest extends BytesWritable implements Comparable<B
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+	
+	public BasicRequest addAttribute(String attribute, Object value) {
+    	attributes.put(attribute, value);
+    	return this;
+	}
+
+	public Object getAttribute(String attribute) {
+		Object value = attributes.get(attribute);
+		if(value == null && parentRequest != null){
+			value = parentRequest.getAttribute(attribute);
+		}
+    	return value;
+	}
+	
+	public Map<String,Object> getAttributes(){
+		return attributes;
+	}
+
+	public Set<String> enumAttributeNames() {
+		return attributes.keySet();
 	}
 	
 	/**
@@ -116,49 +127,25 @@ public abstract class BasicRequest extends BytesWritable implements Comparable<B
 		}
 	}
 	
-	/**
-	 * 设置属性
-	 * @param attribute
-	 * @param value
-	 * @return  返回BasicRequest对象自身
-	 */
-	public abstract  BasicRequest addAttribute(String attribute,Object value);
-	
-	/**
-	 * 取得属性
-	 * @param attribute
-	 * @return 返回attribute属性对应的value。没有则返回null
-	 */
-	public abstract Object getAttribute(String attribute);
-	
-	/**
-	 * 枚举所有的属性名
-	 * @param attribute
-	 * @return
-	 */
-	public abstract Set<String> enumAttributeNames();
-	
-	public abstract Map<String,Object> getAttributes();
-
 	@Override
 	public void write(DataOutput out) throws IOException {
-		out.writeUTF(type.name());
 		out.writeInt(priority);
 		out.writeInt(requestCount);
+		String attributesJson = JSON.toJSONString(attributes);
+		byte[] body = attributesJson.getBytes("UTF-8");
+		out.writeInt(body.length);
+		out.write(body);
 	}
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		String typeName = in.readUTF();
-		if (typeName.equals(Type.PAGE_REQUEST.name())){
-			type = Type.PAGE_REQUEST;
-		}else if(typeName.equals(Type.BINARY_REQUEST.name())){
-			type = Type.BINARY_REQUEST;
-		}else if(typeName.equals(Type.TRANSACTION_REQUEST.name())){
-			type = Type.TRANSACTION_REQUEST;
-		}
 		priority = in.readInt();
 		requestCount = in.readInt();
+		int len = in.readInt();
+		byte[] body = new byte[len];
+		in.readFully(body);
+		String attributesJson = new String(body,"UTF-8");
+		attributes = JSON.parseObject(attributesJson, Map.class);
 	}
 	
 }

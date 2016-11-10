@@ -25,10 +25,14 @@ public final class PageRequest extends HttpRequest{
     
     
     public PageRequest(){
-    	type = type.PAGE_REQUEST;
     	method = Method.GET;
     }
     
+	public PageRequest(String url, String processor) {
+		this.url = url;
+		this.processor = processor;
+	}
+
 	public PageEncoding getPageEncoding() {
 		return pageEncoding;
 	}
@@ -80,13 +84,4 @@ public final class PageRequest extends HttpRequest{
 		return true;
 	}
 	
-	
-	@Override
-	public String toString() {
-		return "PageRequest [url=" + url + ", method=" + method + ", pageEncoding=" + pageEncoding + ", requestParams="
-				+ requestParams + ", headers=" + headers + ", processor=" + processor + ", attributes=" + attributes 
-				+ ", type=" + type + ", getPriority()="
-				+ getPriority() + "]";
-	}
-
 }

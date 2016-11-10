@@ -26,9 +26,6 @@ public class PhantomJsDriverPool extends DriverPoolInterface<PhantomJSDriver> {
 
 	@Override
 	public PhantomJSDriver createDriver() {
-		if (System.getProperty("phantomjs.binary.path") == null){
-			System.setProperty("phantomjs.binary.path", "/Users/stephen/banana/phantomjs-2.1.1-macosx/bin/phantomjs");
-		}
 		return new PhantomJSDriver();
 	}
 

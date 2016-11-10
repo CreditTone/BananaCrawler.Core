@@ -15,6 +15,10 @@ public class PhantomJsDownloader extends DefaultHttpDownloader {
 	private final Logger logger = Logger.getLogger(PhantomJsDownloader.class);
 	
 	private PhantomJsDriverPool driverPool = new PhantomJsDriverPool();
+	
+	public PhantomJsDownloader(String phantomjs) {
+		System.setProperty("phantomjs.binary.path", phantomjs);
+	}
 
 	@Override
 	public Page download(PageRequest request) {
@@ -52,6 +56,11 @@ public class PhantomJsDownloader extends DefaultHttpDownloader {
 	public void open() {
 		super.open();
 		driverPool.open();
+	}
+
+	@Override
+	public boolean supportJavaScript() {
+		return true;
 	}
 	
 }

@@ -22,7 +22,7 @@ import banana.core.util.URLEncodedUtils;
 
 import java.util.Map.Entry;
 
-public abstract class HttpRequest extends AttributeRequest {
+public abstract class HttpRequest extends BasicRequest {
 
 	/**
 	 * 方法类型

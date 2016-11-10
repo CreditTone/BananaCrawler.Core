@@ -51,7 +51,7 @@ public final class StartContext extends BytesWritable{
 	 * @param pageEncoding  URL对应网页的编码
 	 */
 	public StartContext(String url,String processor,PageEncoding pageEncoding) {
-		HttpRequest seed = RequestBuilder.createPageRequest(url, processor, 0 ,pageEncoding);
+		HttpRequest seed = RequestBuilder.custom().setUrl(url).setProcessor(processor).setPriority(0).setPageEncoding(pageEncoding).build();
 		seeds.add(seed);
 	}
 	

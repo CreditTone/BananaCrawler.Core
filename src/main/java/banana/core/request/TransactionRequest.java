@@ -14,7 +14,7 @@ import banana.core.processor.TransactionCallBack;
  * 直到所有的child下载完成TransactionRequest回调 TransactionCallBack的callBack方法通知业务层这个TransactionRequest下载完成。
  * 
  */
-public class TransactionRequest extends AttributeRequest implements TransactionCallBack{
+public class TransactionRequest extends BasicRequest implements TransactionCallBack{
 	
 	/**
 	 * 事务处理可以含有多个Request
@@ -27,7 +27,6 @@ public class TransactionRequest extends AttributeRequest implements TransactionC
 	private ConcurrentHashMap<String, Boolean> successFlag = new ConcurrentHashMap<String, Boolean>();
 	
 	public TransactionRequest(){
-		type = Type.TRANSACTION_REQUEST;
 	}
 
 
@@ -97,13 +96,4 @@ public class TransactionRequest extends AttributeRequest implements TransactionC
 	public void callBack(TransactionRequest transactionRequest) throws Exception {
 	}
 
-
-
-	@Override
-	public String toString() {
-		return "TransactionRequest [childRequest=" + childRequest + ", successFlag=" + successFlag + ", attributes="
-				+ attributes + ", uuid=" + uuid + ", type=" + type + "]";
-	}
-	
-	
 }

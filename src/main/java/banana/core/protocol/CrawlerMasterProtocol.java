@@ -8,6 +8,7 @@ import org.apache.hadoop.ipc.VersionedProtocol;
 
 
 import banana.core.exception.CrawlerMasterException;
+import banana.core.modle.MasterConfig;
 import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
 
@@ -30,7 +31,7 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	
 	IntWritable removeBeforeResult(String collection,String taskname) throws Exception;
 	
-	Text getMasterPropertie(String name) throws CrawlerMasterException;
+	MasterConfig getMasterConfig() throws CrawlerMasterException;
 	
 	void pushTaskRequest(String taskId,HttpRequest request) throws CrawlerMasterException;
 	

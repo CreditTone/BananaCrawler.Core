@@ -118,34 +118,6 @@ public class HttpClientFactory {
         return httpClient;
     }
 	
-	
-	public static void main(String[] args) throws Exception{
-		HttpClientFactory factory = new HttpClientFactory();
-		CloseableHttpClient client = factory.buildHttpsClient(null);
-		HttpGet method = new HttpGet("http://www.ip5.me/index.php");
-		HttpContext httpContext = null;
-		Builder builder = RequestConfig.custom().setSocketTimeout(10*1000).setConnectTimeout(10*1000);//设置请求和传输超时时间;
-		builder.setAuthenticationEnabled(true);
-		HttpHost proxy = new HttpHost("216.230.232.246",53799); 
-		builder.setProxy(proxy);
-		httpContext = new BasicHttpContext();
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(
-	                new AuthScope("216.230.232.246", 53799),
-	                new UsernamePasswordCredentials("creditease", "wFNbWvH5JcD0"));
-		httpContext.setAttribute(HttpClientContext.CREDS_PROVIDER, credsProvider);
-		method.setConfig(builder.build());
-		
-		HttpResponse response = client.execute(method,httpContext);
-		String content = EntityUtils.toString(response.getEntity(),"gb2312");
-		System.out.println(content);
-		FileUtils.write(new File("/Users/stephen/se.html"), content);
-		
-		 response = client.execute(new HttpGet("http://www.hao123.com"));
-		 content = EntityUtils.toString(response.getEntity(),"gb2312");
-		//System.out.println(content);
-		FileUtils.write(new File("/Users/stephen/se1.html"), content);
-	}
 }
 
 

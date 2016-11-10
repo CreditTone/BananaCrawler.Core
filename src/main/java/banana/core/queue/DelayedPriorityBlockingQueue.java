@@ -1,31 +1,15 @@
 package banana.core.queue;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
-
-import com.alibaba.fastjson.JSONObject;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
 
 import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
-import banana.core.request.RequestBuilder;
-import banana.core.request.StartContext;
 import banana.core.util.SystemUtil;
 
 
@@ -166,47 +150,6 @@ public final class DelayedPriorityBlockingQueue implements BlockingRequestQueue 
 		}
 	}
 	
-	public static void main(String[] args) throws UnknownHostException {
-		MongoClient client = null;
-		ServerAddress serverAddress = new ServerAddress("localhost", 27017);
-		List<ServerAddress> seeds = new ArrayList<ServerAddress>();
-		seeds.add(serverAddress);
-		String userName = "crawler";
-		String dataBase = "crawler";
-		String password = "crawler";
-		MongoCredential credentials = MongoCredential.createCredential(userName, dataBase,
-				password.toCharArray());
-		client = new MongoClient(seeds, Arrays.asList(credentials));
-		DB db = client.getDB("crawler");
-		DelayedPriorityBlockingQueue queue = new DelayedPriorityBlockingQueue(1000);
-		StartContext context = new StartContext();
-		for (int i = 0; i < 100; i++) {
-			PageRequest req = RequestBuilder.createPageRequest("http://www.hao123.com", "123");
-			JSONObject obj = new JSONObject();
-			obj.put("aaa", "bbb");
-			req.addAttribute("a", "b"+i);
-			req.addAttribute("_data", obj);
-			req.setPriority(i);
-			queue.add(req);
-		}
-		GridFS tracker_status = new GridFS(db,"tracker_stat");
-//		tracker_status.remove("taobaoshop_taobaoshoplist_links");
-//		GridFSInputFile file = tracker_status.createFile(queue.getStream());
-//		file.setFilename("taobaoshop_taobaoshoplist_links");
-//		file.save();
-		DelayedPriorityBlockingQueue queue2 = new DelayedPriorityBlockingQueue(0);
-		GridFSDBFile file = tracker_status.findOne("taobaoshop_taobaoshoplist_links");
-		byte[] data = SystemUtil.inputStreamToBytes(file.getInputStream());
-		System.out.println(data.length);
-		queue2.load(new ByteArrayInputStream(data));
-		System.out.println(queue2.size());
-		while(!queue2.isEmpty()){
-			HttpRequest req = queue2.poll();
-			System.out.println(req.getUrl() + " " +req.getPriority());
-			System.out.println(req.getAttribute("_data"));
-		}
-	}
-
 	@Override
 	public byte[] toBytes() {
 		byte[] qdata = null;

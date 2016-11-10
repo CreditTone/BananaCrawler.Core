@@ -67,5 +67,5 @@ public abstract class BytesWritable implements Writable {
 			}
 		}
 	}
-	
+
 }

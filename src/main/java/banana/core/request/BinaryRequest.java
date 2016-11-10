@@ -7,11 +7,9 @@ package banana.core.request;
 public final class BinaryRequest extends HttpRequest {
 
 	public BinaryRequest(){
-		this.type = Type.BINARY_REQUEST;
 	}
 	
 	public BinaryRequest(String url, String binaryProccessor){
-		this();
 		this.processor = binaryProccessor;
 		this.setUrl(url);
 	}
