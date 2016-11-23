@@ -8,6 +8,6 @@ import banana.core.response.StreamResponse;
  */
 public interface BinaryProcessor {
 	
-	public void process(StreamResponse stream);
+	public void process(StreamResponse stream,String ... args) throws Exception;
 	
 }

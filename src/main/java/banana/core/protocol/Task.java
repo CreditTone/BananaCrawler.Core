@@ -99,6 +99,15 @@ public final class Task implements Writable{
 		
 	}
 	
+	public static class DownloadProcessor {
+		
+		public String index;
+		
+		public Map<String,String>[] files;
+		
+	}
+	
+	
 	public static final class ProcessorForwarder extends BasicProcessor {
 		
 		public Map<String,String>[] selector;
@@ -206,6 +215,11 @@ public final class Task implements Writable{
 	 */
 	public List<Processor> processors;
 	
+	/**
+	 * 文件处理器
+	 */
+	public List<DownloadProcessor> download_processors;
+	
 	public String data;
 	
 	public boolean synchronizeLinks;
@@ -225,6 +239,7 @@ public final class Task implements Writable{
 		String timerJson = timer == null?"{}":JSON.toJSONString(timer);
 		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
 		String processorJson = JSON.toJSONString(processors);
+		String downloadProcessorJson = download_processors==null?"[]":JSON.toJSONString(download_processors);
 		out.writeUTF(filterJson);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
@@ -232,6 +247,7 @@ public final class Task implements Writable{
 		out.writeUTF(timerJson);
 		out.writeUTF(forwarderJson);
 		out.writeUTF(processorJson);
+		out.writeUTF(downloadProcessorJson);
 	}
 
 	@Override
@@ -249,6 +265,7 @@ public final class Task implements Writable{
 		String timerJson = in.readUTF();
 		String forwarderJson = in.readUTF();
 		String processorJson = in.readUTF();
+		String downloadProcessorJson = in.readUTF();
 		
 		filter = JSON.parseObject(filterJson, Filter.class);
 		
@@ -281,6 +298,13 @@ public final class Task implements Writable{
 		for (int i = 0; i < array.size(); i++) {
 			Processor processor = JSON.parseObject(array.getJSONObject(i).toString(), Processor.class);
 			processors.add(processor);
+		}
+		
+		download_processors = new ArrayList<DownloadProcessor>();
+		array = JSONArray.parseArray(downloadProcessorJson);
+		for (int i = 0; i < array.size(); i++) {
+			DownloadProcessor processor = JSON.parseObject(array.getJSONObject(i).toString(), DownloadProcessor.class);
+			download_processors.add(processor);
 		}
 	}
 	
