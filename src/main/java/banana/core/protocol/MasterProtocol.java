@@ -13,7 +13,7 @@ import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
 
 
-public interface CrawlerMasterProtocol extends VersionedProtocol{
+public interface MasterProtocol extends VersionedProtocol{
 	
 	public static final long versionID = 1L;
 	
@@ -22,6 +22,8 @@ public interface CrawlerMasterProtocol extends VersionedProtocol{
 	void submitTask(Task config) throws Exception;
 	
 	void stopTask(String taskname) throws Exception;
+	
+	void stopCluster() throws Exception;
 	
 	BooleanWritable existTask(String taskname);
 	

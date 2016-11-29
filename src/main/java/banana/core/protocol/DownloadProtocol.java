@@ -19,5 +19,7 @@ public interface DownloadProtocol extends VersionedProtocol {
 	
 	void stopDownloadTracker(String taskId) throws DownloadException;
 	
+	void stopDownloader() throws DownloadException;
+	
 	NodeStatus healthCheck() throws DownloadException;
 }
