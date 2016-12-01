@@ -32,6 +32,8 @@ public class MasterConfig implements Writable{
 	public MongoDB mongodb;
 
 	public String jdbc;
+	
+	public String password;
 
 	@Override
 	public void write(DataOutput out) throws IOException {
@@ -45,6 +47,7 @@ public class MasterConfig implements Writable{
 		this.jdbc = config.jdbc;
 		this.extractor = config.extractor;
 		this.mongodb = config.mongodb;
+		this.password = config.password;
 	}
 
 }

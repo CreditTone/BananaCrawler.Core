@@ -160,7 +160,7 @@ public class DefaultHttpDownloader extends HttpDownloader{
 		Map<String,String> headers = getFirefoxHeaders();
 		headers.putAll(custom_headers);//覆盖自定义请求头
 		Set<Entry<String, String>> keyValues = headers.entrySet();
-		RequestConfig config = RequestConfig.custom().setSocketTimeout(timeout*1000).setConnectTimeout(timeout*1000).setRedirectsEnabled(true).setCircularRedirectsAllowed(true).build();
+		RequestConfig config = RequestConfig.custom().setSocketTimeout(timeout*1000).setConnectTimeout(timeout*1000).setConnectionRequestTimeout(timeout*1000).setRedirectsEnabled(true).setCircularRedirectsAllowed(true).build();
 		switch(request.getMethod()){
 			case GET:
 				HttpGet get = new HttpGet(request.getUrl());
@@ -212,7 +212,4 @@ public class DefaultHttpDownloader extends HttpDownloader{
 		this.timeout = second;
 	}
 
-	
-	
-	
 }

@@ -114,15 +114,6 @@ public final class Task implements Writable{
 		
 	}
 	
-	public static final class Filter{
-		
-		public String type;
-		
-		public String key_name;
-		
-		public HashSet<String>  target;
-
-	}
 	
 	public void verify() throws Exception {
 		if (name == null || name.trim().equals("")){
@@ -177,9 +168,6 @@ public final class Task implements Writable{
 			loops = 1;
 		}
 		
-		if (filter.target == null){
-			filter.target = new HashSet<String>();
-		}
 	}
 	
 	/**
@@ -197,7 +185,7 @@ public final class Task implements Writable{
 	
 	public Map<String,Object> queue;
 	
-	public Filter filter;
+	public String filter;
 	
 	/**
 	 * 任务的初始种子
@@ -232,7 +220,7 @@ public final class Task implements Writable{
 		out.writeInt(thread);
 		out.writeInt(loops);
 		out.writeBoolean(synchronizeLinks);
-		String filterJson = JSON.toJSONString(filter == null?new Filter():filter);
+		out.writeUTF(filter == null?"":filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds == null?new ArrayList<Seed>():seeds);
 		String seedQueryJson = seed_query == null?"{}":JSON.toJSONString(seed_query);
@@ -240,7 +228,6 @@ public final class Task implements Writable{
 		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
 		String processorJson = JSON.toJSONString(processors);
 		String downloadProcessorJson = download_processors==null?"[]":JSON.toJSONString(download_processors);
-		out.writeUTF(filterJson);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
 		out.writeUTF(seedQueryJson);
@@ -258,7 +245,7 @@ public final class Task implements Writable{
 		thread = in.readInt();
 		loops = in.readInt();
 		synchronizeLinks = in.readBoolean();
-		String filterJson = in.readUTF();
+		filter = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
 		String seedQueryJson = in.readUTF();
@@ -266,8 +253,6 @@ public final class Task implements Writable{
 		String forwarderJson = in.readUTF();
 		String processorJson = in.readUTF();
 		String downloadProcessorJson = in.readUTF();
-		
-		filter = JSON.parseObject(filterJson, Filter.class);
 		
 		queue = JSON.parseObject(queueJson, Map.class);
 		
