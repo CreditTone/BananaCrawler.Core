@@ -3,11 +3,13 @@ package banana.core.modle;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.hadoop.io.Writable;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 
 public class TaskStatus implements Writable{
 	
@@ -77,11 +79,12 @@ public class TaskStatus implements Writable{
 		}
 		dataCount = in.readInt();
 		requestCount = in.readInt();
-//		JSONArray array = JSON.parseArray(in.readUTF());
-//		for (int i = 0; i < array.length; i++) {
-//			
-//		}
-		downloaderTrackerStatus = JSON.parseObject(in.readUTF(), List.class);
+		JSONArray array = JSON.parseArray(in.readUTF());
+		downloaderTrackerStatus = new ArrayList<DownloaderTrackerStatus>();
+		for (int i = 0; i < array.size(); i++) {
+			String json = array.getJSONObject(i).toJSONString();
+			downloaderTrackerStatus.add(JSON.parseObject(json, DownloaderTrackerStatus.class));
+		}
 	}
 
 	@Override
