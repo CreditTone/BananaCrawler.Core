@@ -1,7 +1,15 @@
 package banana.core.request;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.http.NameValuePair;
+
 import banana.core.request.HttpRequest.Method;
 import banana.core.request.PageRequest.PageEncoding;
+import banana.core.util.URLEncodedUtils;
 
 public final class RequestBuilder {
 	
@@ -65,12 +73,12 @@ public final class RequestBuilder {
         	req.load(requestBody);
     	}else{
     		if (url != null){
-    			ret = new PageRequest(url,processor);
+    			ret = new PageRequest(normalUrl(url),processor);
     			if (pageEncoding != null){
         			((PageRequest)ret).setPageEncoding(pageEncoding);
         		}
     		}else{
-    			ret = new BinaryRequest(download, processor);
+    			ret = new BinaryRequest(normalUrl(download), processor);
     		}
     		ret.setMethod(method);
     		if(priority >=0 && priority<=1000){
@@ -80,6 +88,36 @@ public final class RequestBuilder {
     		}
     	}
     	return ret;
+    }
+    
+    private String normalUrl(String url){
+    	if (url.startsWith("//")){
+    		url = "https:" + url;
+    	}
+    	if (!url.contains("?")){
+			return url;
+		}
+		String[] urlData  = url.split("\\?");
+		String baseUrl = urlData[0];
+		String querys  = urlData[1];
+		List<NameValuePair> pair = URLEncodedUtils.parse(querys);
+		Map<String,String> pramas = new HashMap<String,String>();
+		for (NameValuePair nameValue : pair){
+			pramas.put(nameValue.getName(), nameValue.getValue());
+		}
+		baseUrl += "?";
+		if (!pair.isEmpty()){
+			Iterator<String> iter = pramas.keySet().iterator();
+			String name = null;
+			while(iter.hasNext()){
+				name = iter.next();
+				baseUrl += name + "=" + pramas.get(name);
+				if (iter.hasNext()){
+					baseUrl += "&";
+				}
+			}
+		}
+		return baseUrl;
     }
     
 }
