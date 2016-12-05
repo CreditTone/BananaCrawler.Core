@@ -84,6 +84,9 @@ public class ExpandHandlebars extends Handlebars {
 			public Object apply(Object context, Options options) throws IOException {
 				Object s1 = options.param(0);
 				Object s2 = options.param(1);
+				if (s1 == null || s2 == null){
+					return false;
+				}
 				return s1.equals(s2);
 			}
 		});
