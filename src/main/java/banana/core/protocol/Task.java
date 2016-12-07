@@ -89,6 +89,7 @@ public final class Task implements Writable{
 		
 		public Map<String,Object> task_context;
 		
+		public String[] logs;
 	}
 	
 	public static final class Processor extends BasicProcessor {
@@ -163,11 +164,6 @@ public final class Task implements Writable{
 		if (thread <= 0){
 			throw new IllegalArgumentException("the number of threads must be greater than zero");
 		}
-		
-		if (loops <= 0){
-			loops = 1;
-		}
-		
 	}
 	
 	/**
@@ -180,8 +176,6 @@ public final class Task implements Writable{
 	public String downloader = "default";
 	
 	public int thread;
-	
-	public int loops;
 	
 	public Map<String,Object> queue;
 	
@@ -218,7 +212,6 @@ public final class Task implements Writable{
 		out.writeUTF(collection);
 		out.writeUTF(downloader);
 		out.writeInt(thread);
-		out.writeInt(loops);
 		out.writeBoolean(synchronizeLinks);
 		out.writeUTF(filter == null?"":filter);
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
@@ -243,7 +236,6 @@ public final class Task implements Writable{
 		collection = in.readUTF();
 		downloader = in.readUTF();
 		thread = in.readInt();
-		loops = in.readInt();
 		synchronizeLinks = in.readBoolean();
 		filter = in.readUTF();
 		String queueJson = in.readUTF();
