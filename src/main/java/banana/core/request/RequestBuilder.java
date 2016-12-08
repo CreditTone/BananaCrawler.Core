@@ -103,7 +103,8 @@ public final class RequestBuilder {
 		List<NameValuePair> pair = URLEncodedUtils.parse(querys);
 		Map<String,String> pramas = new HashMap<String,String>();
 		for (NameValuePair nameValue : pair){
-			pramas.put(nameValue.getName(), nameValue.getValue());
+			String value = nameValue.getValue().replaceAll(" ", "+");
+			pramas.put(nameValue.getName(), value);
 		}
 		baseUrl += "?";
 		if (!pair.isEmpty()){
