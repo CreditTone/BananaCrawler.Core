@@ -3,6 +3,7 @@ package banana.core.download;
 import java.io.Closeable;
 
 import banana.core.request.BinaryRequest;
+import banana.core.request.Cookies;
 import banana.core.request.PageRequest;
 import banana.core.response.Page;
 import banana.core.response.StreamResponse;
@@ -20,4 +21,7 @@ public abstract class HttpDownloader implements Closeable{
 
     public abstract void setTimeout(int second);
     
+    public abstract void injectCookies(Cookies cookies);
+    
+    public abstract void blockDriver(String driverId);
 }

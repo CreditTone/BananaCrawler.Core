@@ -16,6 +16,7 @@ import org.apache.hadoop.io.Writable;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 
+
 public final class Task implements Writable{
 	
 	public static class Seed{
@@ -81,6 +82,14 @@ public final class Task implements Writable{
 	
 	public static class BasicProcessor {
 		
+		public static final class BlockCondition {
+			
+			public String condition;
+			
+			public String email;
+			
+		}
+		
 		public String index;
 		
 		public ContentPrepare content_prepare;
@@ -88,6 +97,8 @@ public final class Task implements Writable{
 		public Map<String,Object> page_context;
 		
 		public Map<String,Object> task_context;
+		
+		public List<BlockCondition> blockConditions;
 		
 		public String[] logs;
 	}
@@ -205,6 +216,7 @@ public final class Task implements Writable{
 	public String data;
 	
 	public boolean synchronizeLinks;
+	
 
 	@Override
 	public void write(DataOutput out) throws IOException {
@@ -245,6 +257,7 @@ public final class Task implements Writable{
 		String forwarderJson = in.readUTF();
 		String processorJson = in.readUTF();
 		String downloadProcessorJson = in.readUTF();
+		String blockConditionsJson = in.readUTF();
 		
 		queue = JSON.parseObject(queueJson, Map.class);
 		
@@ -283,6 +296,7 @@ public final class Task implements Writable{
 			DownloadProcessor processor = JSON.parseObject(array.getJSONObject(i).toString(), DownloadProcessor.class);
 			download_processors.add(processor);
 		}
+		
 	}
 	
 }

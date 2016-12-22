@@ -29,9 +29,4 @@ public class PhantomJsDriverPool extends DriverPoolInterface<PhantomJSDriver> {
 		return new PhantomJSDriver();
 	}
 
-	@Override
-	public void returnToPool(PhantomJSDriver driver) {
-		queue.add(driver);
-	}
-
 }

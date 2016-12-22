@@ -3,7 +3,10 @@ package banana.core.download.impl;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,8 +23,11 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import banana.core.download.HttpDownloader;
+import banana.core.download.ZHttpClient;
 import banana.core.download.pool.HttpClientPool;
 import banana.core.request.BinaryRequest;
+import banana.core.request.Cookie;
+import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
 import banana.core.response.Page;
@@ -39,6 +45,8 @@ public class DefaultHttpDownloader extends HttpDownloader{
 	
 	private volatile HttpClientPool httpClientPool;
 	
+	protected Set<String> blockedDrivers = Collections.synchronizedSet(new HashSet<String>());
+	
 	public DefaultHttpDownloader(){}
 	
 	@Override
@@ -50,15 +58,22 @@ public class DefaultHttpDownloader extends HttpDownloader{
 
 	@Override
 	public Page download(PageRequest request) {
-		Page  page = null;
+		Page page = null;
 		ZHttpClient client =  null;
 		HttpRequestBase method = null;
 		try {
 			client = httpClientPool.get();
+			while(blockedDrivers.contains(client.getId())){
+				httpClientPool.returnToPool(client);
+				Thread.sleep(1000);
+				log.warn("driver blocked " + client.getId());
+				client = httpClientPool.get();
+			}
 			method = buildHttpUriRequest(request);
 			HttpContext httpContext = null;
 			HttpResponse response = client.execute(method,httpContext);
 			page = new Page(request,response);
+			page.setDriverId(client.getId());
 		} catch (Exception e) {
 			if(e instanceof NullPointerException){
 				throw new RuntimeException(e); 
@@ -81,6 +96,12 @@ public class DefaultHttpDownloader extends HttpDownloader{
 		StreamResponse stream = null;
 		try {
 			client = httpClientPool.get();
+			while(blockedDrivers.contains(client.getId())){
+				httpClientPool.returnToPool(client);
+				Thread.sleep(1000);
+				log.warn("driver blocked " + client.getId());
+				client = httpClientPool.get();
+			}
 			method = buildHttpUriRequest(request);
 			HttpContext httpContext = null;
 			HttpResponse response = client.execute(method,httpContext);
@@ -163,7 +184,7 @@ public class DefaultHttpDownloader extends HttpDownloader{
 		RequestConfig config = RequestConfig.custom().setSocketTimeout(timeout*1000).setConnectTimeout(timeout*1000).setConnectionRequestTimeout(timeout*1000).setRedirectsEnabled(true).setCircularRedirectsAllowed(true).build();
 		switch(request.getMethod()){
 			case GET:
-				HttpGet get = new HttpGet(request.getUrl());
+				HttpGet get = new HttpGet(request.getEncodeUrl());
 				//设置请求头
 				for (Entry<String, String> entry : keyValues) {
 					get.setHeader(entry.getKey(), entry.getValue());
@@ -210,6 +231,25 @@ public class DefaultHttpDownloader extends HttpDownloader{
 	@Override
 	public void setTimeout(int second) {
 		this.timeout = second;
+	}
+
+	@Override
+	public void injectCookies(Cookies cookies) {
+		Iterator<ZHttpClient> drivers = httpClientPool.drivers();
+		while(drivers.hasNext()){
+			ZHttpClient client = drivers.next();
+			Iterator<Cookie> cookieIter = cookies.iterator();
+			while (cookieIter.hasNext()){
+				Cookie cookie = cookieIter.next();
+				client.getCookieStore().addCookie(cookie.getHttpClientCookie());
+			}
+			blockedDrivers.remove(client.getId());
+		}
+	}
+
+	@Override
+	public void blockDriver(String driverId) {
+		blockedDrivers.add(driverId);
 	}
 
 }

@@ -1,16 +1,15 @@
 package banana.core.request;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.Date;
 
-import banana.core.BytesWritable;
+import org.apache.http.impl.cookie.BasicClientCookie;
 
-public class Cookie extends BytesWritable {
-	private final String name;
+
+public class Cookie {
 	
-	private final String value;
+	private String name;
+	
+	private String value;
 	
 	private String domain;
 	
@@ -21,6 +20,9 @@ public class Cookie extends BytesWritable {
 	private boolean secure;
 	
 	private boolean httpOnly;
+	
+	public Cookie(){
+	}
 
 	public Cookie(String name, String value) {
 		super();
@@ -36,6 +38,13 @@ public class Cookie extends BytesWritable {
 		return value;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
 
 	public String getDomain() {
 		return domain;
@@ -75,6 +84,20 @@ public class Cookie extends BytesWritable {
 
 	public void setHttpOnly(boolean httpOnly) {
 		this.httpOnly = httpOnly;
+	}
+	
+	public org.apache.http.cookie.Cookie getHttpClientCookie(){
+		BasicClientCookie bcc = new BasicClientCookie(name, value);
+		bcc.setDomain(domain);
+		bcc.setExpiryDate(expiry);
+		bcc.setPath(path);
+		bcc.setSecure(secure);
+		return bcc;
+	}
+	
+	public org.openqa.selenium.Cookie getSeleniumCookie(){
+		org.openqa.selenium.Cookie sc = new org.openqa.selenium.Cookie(name, value, domain, path, expiry, secure, httpOnly);
+		return sc;
 	}
 
 	@Override
@@ -137,14 +160,5 @@ public class Cookie extends BytesWritable {
 			return false;
 		return true;
 	}
-
-	@Override
-	public void write(DataOutput out) throws IOException {
-	}
-
-	@Override
-	public void readFields(DataInput in) throws IOException {
-	}
-
 	
 }

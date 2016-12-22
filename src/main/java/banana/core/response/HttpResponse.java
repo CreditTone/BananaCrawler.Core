@@ -17,6 +17,8 @@ public class HttpResponse {
 	
 	protected HttpRequest basicRequest;
 	
+	protected String driverId;
+	
 	public HttpResponse(){}
 	
 	public HttpResponse(HttpRequest basicRequest, org.apache.http.HttpResponse response) {
@@ -65,6 +67,14 @@ public class HttpResponse {
 
 	public void setResponseHeader(Map<String, String> responseHeader) {
 		this.responseHeader = responseHeader;
+	}
+
+	public String getDriverId() {
+		return driverId;
+	}
+
+	public void setDriverId(String driverId) {
+		this.driverId = driverId;
 	}
 	
 }

@@ -1,20 +1,13 @@
-package banana.core.download.impl;
+package banana.core.download;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import banana.core.download.pool.HttpClientFactory;
@@ -26,10 +19,7 @@ import banana.core.download.pool.HttpClientFactory;
  */
 public final class ZHttpClient{
 	
-	/**
-	 * 实例池中的编号
-	 */
-	private int index;
+	private String id;
 	
 	private CloseableHttpClient core ;
 	
@@ -38,15 +28,8 @@ public final class ZHttpClient{
 	private HttpClientFactory httpClientFactory;
 	
 	public ZHttpClient(HttpClientFactory httpClientFactory){
+		this.id = UUID.randomUUID().toString();
 		this.httpClientFactory = httpClientFactory;
-	}
-	
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
 	}
 
 	public void setCookieStore(BasicCookieStore cookieStore){
@@ -83,11 +66,9 @@ public final class ZHttpClient{
 		checkInit();
 		return context!=null?core.execute(method,context):core.execute(method);
 	}
-	
-//	public void setProxy(){
-//		core.execute(request, context)
-//		new BasicHttpContext();
-//		HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider)
-//	}
+
+	public String getId() {
+		return id;
+	}
 	
 }

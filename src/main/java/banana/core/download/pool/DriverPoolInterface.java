@@ -2,6 +2,7 @@ package banana.core.download.pool;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,17 +39,19 @@ public abstract class DriverPoolInterface<T> {
 		if (poll != null) {
 			return poll;
 		}
-		if (driverList.size() < max_drivers) {// 如果Driver使用的数量美誉达到capacity则继续创建Driver
+		if (driverList.size() < max_drivers) { //如果Driver使用的数量美誉达到capacity则继续创建Driver
 			synchronized (driverList) {
 				if (driverList.size() < max_drivers) {
 					invokeCreate();
 				}
 			}
 		}
-		return queue.take();// 此方法并不保证立即返回WebDriver，有可能等待之前的Driver执行完回到pool
+		return queue.take();  //此方法并不保证立即返回WebDriver，有可能等待之前的Driver执行完回到pool
 	}
 
-	public abstract void returnToPool(T driver);
+	public void returnToPool(T driver){
+		queue.add(driver);
+	}
 
 	public void invokeCreate() {
 		T poll = createDriver();
@@ -57,6 +60,10 @@ public abstract class DriverPoolInterface<T> {
 	}
 
 	public abstract T createDriver();
+	
+	public Iterator<T> drivers(){
+		return driverList.iterator();
+	}
 
 	public final void setMaxDriverCount(int count) {
 		this.max_drivers = count;
