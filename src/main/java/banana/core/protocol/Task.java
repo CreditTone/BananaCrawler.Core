@@ -72,14 +72,6 @@ public final class Task implements Writable{
 	
 	public static final class CrawlerData extends HashMap{}
 	
-	public static final class ContentPrepare{
-		
-		public List<String> direct;
-		
-		public Map<String,Object> define;
-		
-	}
-	
 	public static class BasicProcessor {
 		
 		public static final class BlockCondition {
@@ -92,7 +84,7 @@ public final class Task implements Writable{
 		
 		public String index;
 		
-		public ContentPrepare content_prepare;
+		public Object content_prepare;
 		
 		public Map<String,Object> page_context;
 		
@@ -105,9 +97,19 @@ public final class Task implements Writable{
 	
 	public static final class Processor extends BasicProcessor {
 		
+		public static final class Forwarder {
+			
+			public String condition;
+			
+			public String processor;
+			
+		}
+		
 		public CrawlerRequest[] crawler_request;
 		
 		public CrawlerData[] crawler_data;
+		
+		public Forwarder[] forwarders;
 		
 	}
 	
@@ -119,10 +121,11 @@ public final class Task implements Writable{
 		
 	}
 	
-	
-	public static final class ProcessorForwarder extends BasicProcessor {
+	public static final class Mode {
 		
-		public Map<String,String>[] selector;
+		public Timer timer;
+		
+		public boolean prepared;
 		
 	}
 	
@@ -175,6 +178,9 @@ public final class Task implements Writable{
 		if (thread <= 0){
 			throw new IllegalArgumentException("the number of threads must be greater than zero");
 		}
+		if (mode != null && mode.prepared && mode.timer != null){
+			throw new IllegalArgumentException("微型任务模式和定时模式不能同时存在");
+		}
 	}
 	
 	/**
@@ -199,9 +205,7 @@ public final class Task implements Writable{
 	
 	public SeedQuery seed_query;
 	
-	public Timer timer;
-	
-	public List<ProcessorForwarder> forwarders;
+	public Mode mode;
 	
 	/**
 	 * 页面处理器
@@ -229,15 +233,13 @@ public final class Task implements Writable{
 		String queueJson = JSON.toJSONString(queue == null?new HashMap<String,Object>():queue);
 		String seedJson = JSON.toJSONString(seeds == null?new ArrayList<Seed>():seeds);
 		String seedQueryJson = seed_query == null?"{}":JSON.toJSONString(seed_query);
-		String timerJson = timer == null?"{}":JSON.toJSONString(timer);
-		String forwarderJson = forwarders==null?"[]":JSON.toJSONString(forwarders);
+		String modeJson = mode == null?"{}":JSON.toJSONString(mode);
 		String processorJson = JSON.toJSONString(processors);
 		String downloadProcessorJson = download_processors==null?"[]":JSON.toJSONString(download_processors);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
 		out.writeUTF(seedQueryJson);
-		out.writeUTF(timerJson);
-		out.writeUTF(forwarderJson);
+		out.writeUTF(modeJson);
 		out.writeUTF(processorJson);
 		out.writeUTF(downloadProcessorJson);
 	}
@@ -253,11 +255,9 @@ public final class Task implements Writable{
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
 		String seedQueryJson = in.readUTF();
-		String timerJson = in.readUTF();
-		String forwarderJson = in.readUTF();
+		String modeJson = in.readUTF();
 		String processorJson = in.readUTF();
 		String downloadProcessorJson = in.readUTF();
-		String blockConditionsJson = in.readUTF();
 		
 		queue = JSON.parseObject(queueJson, Map.class);
 		
@@ -272,15 +272,8 @@ public final class Task implements Writable{
 			seed_query = JSON.parseObject(seedQueryJson, SeedQuery.class);
 		}
 		
-		if (!timerJson.equals("{}")){
-			timer = JSON.parseObject(timerJson, Timer.class);
-		}
-		
-		forwarders = new ArrayList<ProcessorForwarder>();
-		array = JSONArray.parseArray(forwarderJson);
-		for (int i = 0; i < array.size(); i++) {
-			ProcessorForwarder proforwarder = JSON.parseObject(array.getJSONObject(i).toString(), ProcessorForwarder.class);
-			forwarders.add(proforwarder);
+		if (!modeJson.equals("{}")){
+			mode = JSON.parseObject(modeJson, Mode.class);
 		}
 		
 		processors = new ArrayList<Processor>();

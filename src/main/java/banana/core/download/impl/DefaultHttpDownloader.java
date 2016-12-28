@@ -47,7 +47,13 @@ public class DefaultHttpDownloader extends HttpDownloader{
 	
 	protected Set<String> blockedDrivers = Collections.synchronizedSet(new HashSet<String>());
 	
-	public DefaultHttpDownloader(){}
+	public DefaultHttpDownloader(){
+		this(null);
+	}
+	
+	public DefaultHttpDownloader(Cookies initCookies) {
+		httpClientPool = new HttpClientPool(initCookies);
+	}
 	
 	@Override
 	public void close() throws IOException {
@@ -75,16 +81,16 @@ public class DefaultHttpDownloader extends HttpDownloader{
 			page = new Page(request,response);
 			page.setDriverId(client.getId());
 		} catch (Exception e) {
-			if(e instanceof NullPointerException){
-				throw new RuntimeException(e); 
-			}
+			page = new Page();
+			page.setStatus(500);
+			page.setDriverId(client.getId());
 			log.warn("download error " + request.getUrl(),e);
 		}finally {
 			if(method != null){
 				method.abort();
 				method.releaseConnection();
-				httpClientPool.returnToPool(client);
 			}
+			httpClientPool.returnToPool(client);
 		}
 		return page;
 	}
@@ -107,16 +113,13 @@ public class DefaultHttpDownloader extends HttpDownloader{
 			HttpResponse response = client.execute(method,httpContext);
 			stream = new StreamResponse(request,response);
 		} catch (Exception e) {
-			if(e instanceof NullPointerException){
-				throw new RuntimeException(e); 
-			}
 			log.warn("download error " + request.getUrl(),e);
 		}finally {
 			if(method != null){
 				method.abort();
 				method.releaseConnection();
-				httpClientPool.returnToPool(client);
 			}
+			httpClientPool.returnToPool(client);
 		}
 		return stream;
 	}
@@ -147,28 +150,18 @@ public class DefaultHttpDownloader extends HttpDownloader{
 	}
 **/
 	public void setMaxDriverCount(int drivercount) {
-		checkInit();
 		httpClientPool.setMaxDriverCount(drivercount);
 	}
 	
 	public void setMinDriverCount(int drivercount){
-		checkInit();
 		httpClientPool.setMinDriverCount(drivercount);
 	}
 	
 	@Override
 	public void open() {
-		checkInit();
 		httpClientPool.open();
 	}
 	
-	 private void checkInit() {
-	        if (httpClientPool == null) {
-	            synchronized (this){
-	            	httpClientPool = new HttpClientPool();
-	         }
-	     }
-	 }
 	
 	/**
 	 * 根据request构建get或者post请求
@@ -241,7 +234,7 @@ public class DefaultHttpDownloader extends HttpDownloader{
 			Iterator<Cookie> cookieIter = cookies.iterator();
 			while (cookieIter.hasNext()){
 				Cookie cookie = cookieIter.next();
-				client.getCookieStore().addCookie(cookie.getHttpClientCookie());
+				client.getCookieStore().addCookie(cookie.convertHttpClientCookie());
 			}
 			blockedDrivers.remove(client.getId());
 		}

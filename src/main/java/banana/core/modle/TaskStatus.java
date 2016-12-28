@@ -14,7 +14,7 @@ import com.alibaba.fastjson.JSONArray;
 public class TaskStatus implements Writable{
 	
 	public static enum Stat {
-		Runing,Timing,Stopd,NoTask
+		Runing,Timing,Stopd,NoTask,Prepared
 	}
 	
 	public static final class DownloaderTrackerStatus {
@@ -52,6 +52,8 @@ public class TaskStatus implements Writable{
 			out.writeInt(2);
 		}else if (stat == Stat.NoTask){
 			out.writeInt(3);
+		}else if (stat == Stat.Prepared){
+			out.writeInt(4);
 		}
 		out.writeInt(dataCount);
 		out.writeInt(requestCount);
@@ -76,6 +78,8 @@ public class TaskStatus implements Writable{
 		case 3:
 			this.stat = Stat.NoTask;
 			break;
+		case 4:
+			this.stat = Stat.Prepared;
 		}
 		dataCount = in.readInt();
 		requestCount = in.readInt();

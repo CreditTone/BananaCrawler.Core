@@ -23,11 +23,13 @@ public interface MasterProtocol extends VersionedProtocol{
 	
 	CommandResponse submitTask(Task config) throws Exception;
 	
+	CommandResponse startPreparedTask(PreparedTask config) throws Exception;
+	
 	CommandResponse stopTask(String taskname)throws Exception;
 	
 	CommandResponse stopCluster() throws Exception;
 	
-	TaskStatus taskStatus(Task taskconfig);
+	TaskStatus taskStatus(String taskname);
 	
 	IntWritable removeBeforeResult(String collection,String taskname) throws Exception;
 	

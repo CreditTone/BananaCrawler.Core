@@ -20,12 +20,13 @@ public class PhantomJsDownloader extends DefaultHttpDownloader {
 	
 	private final Logger logger = Logger.getLogger(PhantomJsDownloader.class);
 	
-	private PhantomJsDriverPool driverPool = new PhantomJsDriverPool();
+	private PhantomJsDriverPool driverPool;
 	
-	public PhantomJsDownloader(String phantomjs) {
+	public PhantomJsDownloader(String phantomjs,Cookies cookies) {
 		System.setProperty("phantomjs.binary.path", phantomjs);
+		driverPool = new PhantomJsDriverPool(cookies);
 	}
-
+	
 	@Override
 	public Page download(PageRequest request) {
 		Page page = null;
@@ -85,7 +86,7 @@ public class PhantomJsDownloader extends DefaultHttpDownloader {
 			Iterator<Cookie> cookieIter = cookies.iterator();
 			while (cookieIter.hasNext()){
 				Cookie cookie = cookieIter.next();
-				driver.manage().addCookie(cookie.getSeleniumCookie());
+				driver.manage().addCookie(cookie.convertSeleniumCookie());
 			}
 			blockedDrivers.remove(driver.getSessionId().toString());
 		}

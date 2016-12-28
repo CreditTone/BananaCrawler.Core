@@ -25,11 +25,8 @@ public final class ZHttpClient{
 	
 	private BasicCookieStore cookieStore ;
 	
-	private HttpClientFactory httpClientFactory;
-	
-	public ZHttpClient(HttpClientFactory httpClientFactory){
+	public ZHttpClient(){
 		this.id = UUID.randomUUID().toString();
-		this.httpClientFactory = httpClientFactory;
 	}
 
 	public void setCookieStore(BasicCookieStore cookieStore){
@@ -37,8 +34,7 @@ public final class ZHttpClient{
 			throw new NullPointerException();
 		}
 		this.cookieStore = cookieStore;
-		core = httpClientFactory.buildDefaultHttpClient(cookieStore);
-		
+		core = new HttpClientFactory().buildDefaultHttpClient(cookieStore);
 	}
 	
 	
@@ -54,7 +50,7 @@ public final class ZHttpClient{
 	private final void checkInit(){
 		if(core == null){
 			this.cookieStore = new BasicCookieStore();
-			core = httpClientFactory.buildDefaultHttpClient(cookieStore);
+			core = new HttpClientFactory().buildDefaultHttpClient(cookieStore);
 		}
 	}
 

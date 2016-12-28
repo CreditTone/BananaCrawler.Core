@@ -6,9 +6,17 @@ import java.util.Iterator;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import banana.core.download.pool.DriverPoolInterface;
+import banana.core.request.Cookie;
+import banana.core.request.Cookies;
 
 public class PhantomJsDriverPool extends DriverPoolInterface<PhantomJSDriver> {
 	
+	
+	private Cookies cookies;
+	
+	public PhantomJsDriverPool(Cookies cookies) {
+		this.cookies = cookies;
+	}
 	
 	@Override
 	public void open() {
@@ -26,7 +34,14 @@ public class PhantomJsDriverPool extends DriverPoolInterface<PhantomJSDriver> {
 
 	@Override
 	public PhantomJSDriver createDriver() {
-		return new PhantomJSDriver();
+		PhantomJSDriver driver = new PhantomJSDriver();
+		if (cookies != null){
+			Iterator<Cookie> iter = cookies.iterator();
+			while(iter.hasNext()){
+				driver.manage().addCookie(iter.next().convertSeleniumCookie());
+			}
+		}
+		return driver;
 	}
 
 }

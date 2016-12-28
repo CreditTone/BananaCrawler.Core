@@ -12,7 +12,7 @@ public interface DownloadProtocol extends VersionedProtocol {
 	
 	public static final long versionID = 1L;
 	
-	boolean startDownloadTracker(String taskId,int thread,Task config) throws DownloadException;
+	boolean startDownloadTracker(String taskId,Task config,Cookies cookies) throws DownloadException;
 	
 	void resubmitTaskConfig(String taskId,int thread,Task config) throws DownloadException;
 	

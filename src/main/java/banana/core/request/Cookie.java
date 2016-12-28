@@ -69,6 +69,10 @@ public class Cookie {
 	public void setExpiry(Date expiry) {
 		this.expiry = expiry;
 	}
+	
+	public void setExpires(Date expiry) {
+		this.expiry = expiry;
+	}
 
 	public boolean isSecure() {
 		return secure;
@@ -86,7 +90,7 @@ public class Cookie {
 		this.httpOnly = httpOnly;
 	}
 	
-	public org.apache.http.cookie.Cookie getHttpClientCookie(){
+	public org.apache.http.cookie.Cookie convertHttpClientCookie(){
 		BasicClientCookie bcc = new BasicClientCookie(name, value);
 		bcc.setDomain(domain);
 		bcc.setExpiryDate(expiry);
@@ -95,7 +99,7 @@ public class Cookie {
 		return bcc;
 	}
 	
-	public org.openqa.selenium.Cookie getSeleniumCookie(){
+	public org.openqa.selenium.Cookie convertSeleniumCookie(){
 		org.openqa.selenium.Cookie sc = new org.openqa.selenium.Cookie(name, value, domain, path, expiry, secure, httpOnly);
 		return sc;
 	}

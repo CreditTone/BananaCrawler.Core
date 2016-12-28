@@ -16,6 +16,13 @@ public class Cookies extends BytesWritable {
 	
 	private List<Cookie> cookies = new ArrayList<Cookie>();
 	
+	public Cookies() {
+	}
+	
+	public Cookies(List<Cookie> cookies) {
+		this.cookies = cookies;
+	}
+	
 	public void addCookie(Cookie cookie){
 		cookies.add(cookie);
 	}
@@ -27,18 +34,12 @@ public class Cookies extends BytesWritable {
 	@Override
 	public void write(DataOutput out) throws IOException {
 		String jsonArr = JSON.toJSONString(cookies);
-		byte[] body = jsonArr.getBytes();
-		out.writeInt(body.length);
-		out.write(body);
+		out.writeUTF(jsonArr);
 	}
 
 	@Override
 	public void readFields(DataInput in) throws IOException {
-		int length = in.readInt();
-		byte[] body = new byte[length];
-		in.readFully(body);
-		String jsonArr =  new String(body);
-		JSONArray arr = JSON.parseArray(jsonArr);
+		JSONArray arr = JSON.parseArray(in.readUTF());
 		for (int i= 0 ; i < arr.size() ; i++){
 			cookies.add(JSON.parseObject(arr.getJSONObject(i).toJSONString(), Cookie.class));
 		}

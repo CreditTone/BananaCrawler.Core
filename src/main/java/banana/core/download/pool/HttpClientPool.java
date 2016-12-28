@@ -1,21 +1,39 @@
 package banana.core.download.pool;
 
+import java.util.Iterator;
+
+import org.apache.http.impl.client.BasicCookieStore;
+
 import banana.core.download.ZHttpClient;
+import banana.core.request.Cookie;
+import banana.core.request.Cookies;
 
 
 public final class HttpClientPool extends DriverPoolInterface<ZHttpClient>{
 	
-    private HttpClientFactory httpClientFactory = new HttpClientFactory();
 
+	private Cookies cookies;
 
-    public HttpClientPool() {}
+    public HttpClientPool(Cookies initCookie) {
+    	cookies = initCookie;
+    }
 
     /**
      * 创建核心实例
      */
 	public final ZHttpClient createDriver(){
 		ZHttpClient poll;
-		poll = new ZHttpClient(httpClientFactory);
+		poll = new ZHttpClient();
+		if (cookies != null){
+			BasicCookieStore cookieStore = new BasicCookieStore();
+			Iterator<Cookie> iter = cookies.iterator();
+			while(iter.hasNext()){
+				Cookie cookie = iter.next();
+				cookieStore.addCookie(cookie.convertHttpClientCookie());
+				System.out.println("设置Cookie "+cookie);
+			}
+			poll.setCookieStore(cookieStore);
+		}
 		return poll;
 	}
 
