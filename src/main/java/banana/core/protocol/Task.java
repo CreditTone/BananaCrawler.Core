@@ -141,7 +141,7 @@ public final class Task implements Writable{
 		}else if(collection.contains("_")){
 			throw new IllegalArgumentException("collection cannot contain underscore symbols");
 		}
-		if (!Arrays.asList("default","phantomjs").contains(downloader)){
+		if (!Arrays.asList("default","phantomjs","htmlunit").contains(downloader)){
 			throw new IllegalArgumentException("downloader " + downloader + " doesn't support");
 		}
 		if (processors == null || processors.isEmpty()){

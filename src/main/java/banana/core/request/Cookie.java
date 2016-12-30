@@ -30,6 +30,17 @@ public class Cookie {
 		this.value = value;
 	}
 
+	public Cookie(String name, String value, String domain, String path, Date expiry, boolean secure,
+			boolean httpOnly) {
+		this.name = name;
+		this.value = value;
+		this.domain = domain;
+		this.path = path;
+		this.expiry = expiry;
+		this.secure = secure;
+		this.httpOnly = httpOnly;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -100,8 +111,11 @@ public class Cookie {
 	}
 	
 	public org.openqa.selenium.Cookie convertSeleniumCookie(){
-		org.openqa.selenium.Cookie sc = new org.openqa.selenium.Cookie(name, value, domain, path, expiry, secure, httpOnly);
-		return sc;
+		return new org.openqa.selenium.Cookie(name, value, domain, path, expiry, secure, httpOnly);
+	}
+	
+	public com.gargoylesoftware.htmlunit.util.Cookie convertHtmlunitCookie(){
+		return new com.gargoylesoftware.htmlunit.util.Cookie(domain, name, value, path, expiry, secure, httpOnly);
 	}
 
 	@Override

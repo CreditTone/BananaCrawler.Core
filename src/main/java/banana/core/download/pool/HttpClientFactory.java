@@ -67,7 +67,7 @@ public class HttpClientFactory {
         RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder.<ConnectionSocketFactory>create();
         ConnectionSocketFactory plainSF = new PlainConnectionSocketFactory();
         registryBuilder.register("http", plainSF);
-        try { 
+        try {
             //指定信任密钥存储对象和连接套接字工厂
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             SSLContext sslContext = SSLContexts.custom().useTLS().loadTrustMaterial(trustStore,

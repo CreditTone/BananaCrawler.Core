@@ -45,4 +45,9 @@ public class Cookies extends BytesWritable {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "Cookies [cookies=" + cookies + "]";
+	}
+
 }

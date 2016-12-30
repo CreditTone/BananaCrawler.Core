@@ -23,5 +23,7 @@ public abstract class HttpDownloader implements Closeable{
     
     public abstract void injectCookies(Cookies cookies);
     
+    public abstract Cookies getCookies();
+    
     public abstract void blockDriver(String driverId);
 }
