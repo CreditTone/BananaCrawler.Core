@@ -4,6 +4,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.CookieOrigin;
 import org.apache.http.cookie.CookieSpec;
 import org.apache.http.cookie.CookieSpecProvider;
+import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.impl.cookie.DefaultCookieSpec;
 import org.apache.http.protocol.HttpContext;
 
@@ -19,6 +20,11 @@ public class HttpCookieSpecProvider implements CookieSpecProvider {
 					return true;
 				}
 				return false;
+			}
+
+			@Override
+			public void validate(Cookie cookie, CookieOrigin origin) throws MalformedCookieException {
+				this.match(cookie, origin);
 			}
 			
 		};

@@ -10,6 +10,7 @@ import org.apache.hadoop.ipc.VersionedProtocol;
 import banana.core.exception.CrawlerMasterException;
 import banana.core.modle.CommandResponse;
 import banana.core.modle.MasterConfig;
+import banana.core.modle.TaskError;
 import banana.core.modle.TaskStatus;
 import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
@@ -44,6 +45,8 @@ public interface MasterProtocol extends VersionedProtocol{
 	BooleanWritable filterQuery(String taskId,String ... fields);
 	
 	CommandResponse injectCookies(Cookies cookies,String taskId) throws Exception;
+	
+	void errorStash(String taskId,TaskError taskError) throws Exception;
 
 	//Text getStartContextAttribute(String taskname,String hashCode,String attribute) throws java.rmi.RemoteException;
 	

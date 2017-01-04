@@ -7,4 +7,6 @@ public interface ContextModle extends Map<String, Object> {
 	
 	public String parse(String line) throws IOException;
 	
+	public void copyTo(Map<String,Object> dst);
+	
 }

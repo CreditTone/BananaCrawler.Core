@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 
@@ -128,13 +129,16 @@ public class ExpandHandlebars extends Handlebars {
 
 			public Object apply(Object context, Options options) throws IOException {
 				String content = options.param(0);
-				for (int i = 1; i < options.params.length; i++) {
-					if (!content.contains(options.param(i).toString())){
-						return false;
-					}
+				String value = options.param(1);
+				if (content.contains(value)){
+					return true;
 				}
-				return true;
+				if (Pattern.compile(value).matcher(content).find()){
+					return true;
+				}
+				return false;
 			}
+			
 		});
 		registerHelper("date", new Helper<Object>() {
 
