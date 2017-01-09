@@ -31,6 +31,8 @@ public class TaskError implements Writable{
 	
 	public int firstNativeLineNumber;
 	
+	public String method = "";
+	
 	public Map<String,Object> runtimeContext = new HashMap<String,Object>(){
 
 		@Override
@@ -56,6 +58,7 @@ public class TaskError implements Writable{
 		for (int i = 0; i < stackTraceElements.length; i++) {
 			if(stackTraceElements[i].isNativeMethod()){
 				firstNativeLineNumber = stackTraceElements[i].getLineNumber();
+				method = stackTraceElements[i].getClassName() + "."+ stackTraceElements[i].getMethodName();
 				break;
 			}
 		}
@@ -99,6 +102,7 @@ public class TaskError implements Writable{
 		out.writeUTF(exceptionMessage);
 		out.writeInt(firstNativeLineNumber);
 		out.writeUTF(JSON.toJSONString(runtimeContext));
+		out.writeUTF(method);
 	}
 
 	@Override
@@ -111,6 +115,7 @@ public class TaskError implements Writable{
 		exceptionMessage = in.readUTF();
 		firstNativeLineNumber = in.readInt();
 		runtimeContext = JSON.parseObject(in.readUTF(), Map.class);
+		method = in.readUTF();
 	}
 	
 }

@@ -90,13 +90,16 @@ public final class RequestBuilder {
     	return ret;
     }
     
-    private String normalUrl(String url){
+    public static String normalUrl(String url){
     	if (url.startsWith("//")){
     		url = "https:" + url;
     	}
     	if (!url.contains("?")){
 			return url;
 		}
+    	if(url.contains("??")){
+    		url = url.replace("??", "?");
+    	}
 		String[] urlData  = url.split("\\?");
 		String baseUrl = urlData[0];
 		String querys  = urlData[1];

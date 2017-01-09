@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 
 import java.util.Set;
 
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -20,13 +21,16 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.cookie.CookieSpecProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.apache.log4j.Logger;
 
 import banana.core.download.HttpDownloader;
@@ -50,8 +54,6 @@ public class DefaultHttpDownloader extends HttpDownloader {
 
 	private volatile HttpClientPool httpClientPool;
 	
-	private HttpClientContext context;
-
 	protected Set<String> blockedDrivers = Collections.synchronizedSet(new HashSet<String>());
 
 	public DefaultHttpDownloader() {
@@ -60,17 +62,6 @@ public class DefaultHttpDownloader extends HttpDownloader {
 
 	public DefaultHttpDownloader(Cookies initCookies) {
 		httpClientPool = new HttpClientPool(initCookies);
-		context = HttpClientContext.create();
-		Registry<CookieSpecProvider> registry = RegistryBuilder.<CookieSpecProvider> create()
-				.register(CookieSpecs.DEFAULT, new HttpCookieSpecProvider())
-				.register(CookieSpecs.BROWSER_COMPATIBILITY, new HttpCookieSpecProvider())
-				.register(CookieSpecs.NETSCAPE, new HttpCookieSpecProvider())
-				.register(CookieSpecs.BEST_MATCH, new HttpCookieSpecProvider())
-				.register(CookieSpecs.IGNORE_COOKIES, new HttpCookieSpecProvider())
-				.register(CookieSpecs.STANDARD, new HttpCookieSpecProvider())
-				.register(CookieSpecs.STANDARD_STRICT, new HttpCookieSpecProvider())
-				.build();
-		context.setCookieSpecRegistry(registry);
 	}
 
 	@Override
@@ -94,9 +85,11 @@ public class DefaultHttpDownloader extends HttpDownloader {
 				client = httpClientPool.get();
 			}
 			method = buildHttpUriRequest(request);
+			HttpClientContext context = HttpClientContext.create();
 			HttpResponse response = client.execute(method, context);
 			page = new Page(request, response);
 			page.setDriverId(String.valueOf(client.hashCode()));
+            page.setOwnerUrl(getOwnerUrl(context));
 		} catch (Exception e) {
 			page = new Page();
 			page.setStatus(500);
@@ -126,9 +119,10 @@ public class DefaultHttpDownloader extends HttpDownloader {
 				client = httpClientPool.get();
 			}
 			method = buildHttpUriRequest(request);
-			HttpContext httpContext = null;
-			HttpResponse response = client.execute(method, httpContext);
+			HttpClientContext context = HttpClientContext.create();
+			HttpResponse response = client.execute(method, context);
 			stream = new StreamResponse(request, response);
+			stream.setOwnerUrl(getOwnerUrl(context));
 		} catch (Exception e) {
 			log.warn("download error " + request.getUrl(), e);
 		} finally {
@@ -139,6 +133,12 @@ public class DefaultHttpDownloader extends HttpDownloader {
 			httpClientPool.returnToPool(client);
 		}
 		return stream;
+	}
+	
+	private String getOwnerUrl(HttpClientContext context){
+		HttpHost targetHost = (HttpHost)context.getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
+        HttpUriRequest realRequest = (HttpUriRequest)context.getAttribute(HttpCoreContext.HTTP_REQUEST);
+        return targetHost.toString() + realRequest.getURI().toString();
 	}
 
 	/**

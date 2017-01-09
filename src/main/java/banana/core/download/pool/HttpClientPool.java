@@ -11,12 +11,14 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.cookie.CookieSpecProvider;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 
+import banana.core.download.impl.HttpCookieSpecProvider;
 import banana.core.request.Cookie;
 import banana.core.request.Cookies;
 
@@ -25,6 +27,16 @@ public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClien
 	
 
 	private BasicCookieStore cookieStore = new BasicCookieStore();
+	
+	private Registry<CookieSpecProvider> registry = RegistryBuilder.<CookieSpecProvider> create()
+			.register(CookieSpecs.DEFAULT, new HttpCookieSpecProvider())
+			.register(CookieSpecs.BROWSER_COMPATIBILITY, new HttpCookieSpecProvider())
+			.register(CookieSpecs.NETSCAPE, new HttpCookieSpecProvider())
+			.register(CookieSpecs.BEST_MATCH, new HttpCookieSpecProvider())
+			.register(CookieSpecs.IGNORE_COOKIES, new HttpCookieSpecProvider())
+			.register(CookieSpecs.STANDARD, new HttpCookieSpecProvider())
+			.register(CookieSpecs.STANDARD_STRICT, new HttpCookieSpecProvider())
+			.build();
 
     public HttpClientPool(Cookies initCookie) {
 		if (initCookie != null){
@@ -99,8 +111,9 @@ public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClien
 		RequestConfig requestConfig = configBuilder.build();
 		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig)
 				.setDefaultCookieStore(cookieStore)
+				.setDefaultCookieSpecRegistry(registry)
 				.setConnectionManager(cm).build();
 		return httpClient;
 	}
-    
+	
 }

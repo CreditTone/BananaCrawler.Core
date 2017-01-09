@@ -19,6 +19,8 @@ public class HttpResponse {
 	
 	protected String driverId;
 	
+	protected String ownerUrl;
+	
 	public HttpResponse(){}
 	
 	public HttpResponse(HttpRequest basicRequest, org.apache.http.HttpResponse response) {
@@ -75,6 +77,14 @@ public class HttpResponse {
 
 	public void setDriverId(String driverId) {
 		this.driverId = driverId;
+	}
+
+	public String getOwnerUrl() {
+		return ownerUrl;
+	}
+
+	public void setOwnerUrl(String ownerUrl) {
+		this.ownerUrl = ownerUrl;
 	}
 	
 }
