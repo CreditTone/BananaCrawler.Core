@@ -86,6 +86,8 @@ public final class Task implements Writable{
 		
 		public Object content_prepare;
 		
+		public boolean keep_down;
+		
 		public Map<String,Object> page_context;
 		
 		public Map<String,Object> task_context;

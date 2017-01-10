@@ -178,7 +178,6 @@ public class ExpandHandlebars extends Handlebars {
 	public String escapeParse(String input,Map<String,Object> context) throws IOException{
 		Template template = compileEscapeInline(input);
 		return template.apply(context);
-		
 	}
 	
 

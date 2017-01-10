@@ -5,7 +5,9 @@ import java.util.Map;
 
 public interface ContextModle extends Map<String, Object> {
 	
-	public String parse(String line) throws IOException;
+	public Object parseObject(String line) throws IOException;
+	
+	public String parseString(String line) throws IOException;
 	
 	public void copyTo(Map<String,Object> dst);
 	
