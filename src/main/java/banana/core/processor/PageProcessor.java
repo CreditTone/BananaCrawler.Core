@@ -2,12 +2,10 @@ package banana.core.processor;
 
 import java.util.List;
 
-import banana.core.Static;
 import banana.core.modle.ContextModle;
 import banana.core.modle.CrawlData;
-import banana.core.request.BasicRequest;
+import banana.core.modle.TaskContext;
 import banana.core.request.HttpRequest;
-import banana.core.request.StartContext;
 import banana.core.response.Page;
 
 
@@ -26,7 +24,7 @@ public interface PageProcessor {
 	 * @param queue  加入跟进Request的List容器，处理完成后queue的所有Request会被推送到抓取队列中
 	 * @throws Exception 
 	 */
-	public ContextModle process(Page page,StartContext context,List<HttpRequest> queue,List<CrawlData> objectContainer)throws Exception; 
+	public ContextModle process(Page page,TaskContext context,List<HttpRequest> queue,List<CrawlData> objectContainer)throws Exception; 
 	
 }
 

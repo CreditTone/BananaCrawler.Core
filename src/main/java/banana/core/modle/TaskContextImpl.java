@@ -1,4 +1,4 @@
-package banana.core.request;
+package banana.core.modle;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -10,13 +10,15 @@ import java.util.List;
 import com.alibaba.fastjson.JSON;
 
 import banana.core.BytesWritable;
+import banana.core.request.HttpRequest;
+import banana.core.request.RequestBuilder;
 import banana.core.request.PageRequest.PageEncoding;
 
 /**
- *  StartContext是注入时所有seed的上下文信息如果爬虫在抓取过程当中需要共享一些变量。那么可使用StartContext作为容器。
+ *  TaskContext是注入时所有seed的上下文信息如果爬虫在抓取过程当中需要共享一些变量。那么可使用StartContext作为容器。
  *
  */
-public final class StartContext extends BytesWritable{
+public final class TaskContextImpl extends BytesWritable implements TaskContext{
 	
 	/**
 	 * 全局属性
@@ -32,14 +34,14 @@ public final class StartContext extends BytesWritable{
 	/**
 	 * 构造一个StartContext。通常用来充当seedRequest的容器
 	 */
-	public StartContext(){}
+	public TaskContextImpl(){}
 	
 	/**
 	 * 构造一个StartContext。并且加入一个种子URL
 	 * @param url
 	 * @param processorCls
 	 */
-	public StartContext(String url,String processor) {
+	public TaskContextImpl(String url,String processor) {
 		this(url, processor, null);
 	}
 	
@@ -50,14 +52,12 @@ public final class StartContext extends BytesWritable{
 	 * @param processorCls 
 	 * @param pageEncoding  URL对应网页的编码
 	 */
-	public StartContext(String url,String processor,PageEncoding pageEncoding) {
+	public TaskContextImpl(String url,String processor,PageEncoding pageEncoding) {
 		HttpRequest seed = RequestBuilder.custom().setUrl(url).setProcessor(processor).setPriority(0).setPageEncoding(pageEncoding).build();
 		seeds.add(seed);
 	}
 	
 	
-	
-
 	/**
 	 * 注入种子
 	 * @param request
@@ -84,11 +84,10 @@ public final class StartContext extends BytesWritable{
 		return s;
 	}
 
-	/**
-	 * 返回attribute对应的value 这个方法是线程安全的
-	 * @param key
-	 * @return  返回attribute对应的value
+	/* (non-Javadoc)
+	 * @see banana.core.modle.TaskContext#getContextAttribute(java.lang.String)
 	 */
+	@Override
 	public  Object getContextAttribute(String attribute){
 		Object value;
 		synchronized (contextAttribute) {
@@ -97,12 +96,10 @@ public final class StartContext extends BytesWritable{
 		return value;
 	}
 	
-	/**
-	 * 向StartContext域put一个属性值。并返回之前的attribute对应的value。如果之前没有attribute属性那么返回null。这个方法是线程安全的
-	 * @param attribute
-	 * @param value
-	 * @return 返回之前的attribute对应的value。如果之前没有attribute属性那么返回null
+	/* (non-Javadoc)
+	 * @see banana.core.modle.TaskContext#putContextAttribute(java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public Object putContextAttribute(String attribute, Object value) {
 		synchronized (contextAttribute) {
 			contextAttribute.put(attribute, value);
@@ -118,10 +115,10 @@ public final class StartContext extends BytesWritable{
 		return seeds.size();
 	}
 	
-	/**
-	 * 返回StartContext是否为空。
-	 * @return
+	/* (non-Javadoc)
+	 * @see banana.core.modle.TaskContext#isEmpty()
 	 */
+	@Override
 	public boolean isEmpty(){
 		return seeds.isEmpty();
 	}

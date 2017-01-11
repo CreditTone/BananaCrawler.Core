@@ -8,6 +8,7 @@ import org.apache.hadoop.ipc.VersionedProtocol;
 
 
 import banana.core.exception.CrawlerMasterException;
+import banana.core.modle.BasicWritable;
 import banana.core.modle.CommandResponse;
 import banana.core.modle.MasterConfig;
 import banana.core.modle.TaskError;
@@ -48,6 +49,9 @@ public interface MasterProtocol extends VersionedProtocol{
 	
 	void errorStash(String taskId,TaskError taskError) throws Exception;
 
-	//Text getStartContextAttribute(String taskname,String hashCode,String attribute) throws java.rmi.RemoteException;
+	BasicWritable getTaskContextAttribute(String taskid,String attribute) throws Exception;
 	
+	void putTaskContextAttribute(String taskid,String attribute,BasicWritable value) throws Exception;
+	
+	BooleanWritable taskContextIsEmpty(String taskid);
 }

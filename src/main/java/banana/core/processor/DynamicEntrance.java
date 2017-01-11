@@ -3,7 +3,7 @@ package banana.core.processor;
 import java.util.List;
 import java.util.Map;
 
-import banana.core.request.StartContext;
+import banana.core.modle.TaskContext;
 
 /**
  * 动态生成入口URL。
@@ -26,7 +26,7 @@ public abstract class DynamicEntrance {
 	 * 自定义入口URL
 	 * @return
 	 */
-	public abstract void loadStartContext(StartContext startContext);
+	public abstract void loadStartContext(TaskContext startContext);
 	
 	/**
 	 * 当爬虫完成所有上一次加载的入口URL后，询问是否需要调用loadStartContext继续加载新的入口URL
