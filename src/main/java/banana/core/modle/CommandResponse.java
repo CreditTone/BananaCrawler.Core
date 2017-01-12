@@ -10,7 +10,7 @@ public final class CommandResponse implements Writable{
 	
 	public boolean success;
 	
-	public String error;
+	public String msg;
 	
 	public CommandResponse(){}
 	
@@ -20,17 +20,17 @@ public final class CommandResponse implements Writable{
 	
 	public CommandResponse(boolean success,String error){
 		this.success = success;
-		this.error = error;
+		this.msg = error;
 	}
 	
 	@Override
 	public void write(DataOutput out) throws IOException {
 		out.writeBoolean(success);
-		out.writeUTF(error == null?"":error);
+		out.writeUTF(msg == null?"":msg);
 	}
 	@Override
 	public void readFields(DataInput in) throws IOException {
 		success = in.readBoolean();
-		error = in.readUTF();
+		msg = in.readUTF();
 	}
 }

@@ -90,6 +90,7 @@ public class DefaultHttpDownloader extends HttpDownloader {
 			page = new Page(request, response);
 			page.setDriverId(String.valueOf(client.hashCode()));
             page.setOwnerUrl(getOwnerUrl(context));
+            page.setRedirected(!method.getURI().toString().equals(page.getOwnerUrl()));
 		} catch (Exception e) {
 			page = new Page();
 			page.setStatus(500);
@@ -123,6 +124,7 @@ public class DefaultHttpDownloader extends HttpDownloader {
 			HttpResponse response = client.execute(method, context);
 			stream = new StreamResponse(request, response);
 			stream.setOwnerUrl(getOwnerUrl(context));
+			stream.setRedirected(!method.getURI().toString().equals(stream.getOwnerUrl()));
 		} catch (Exception e) {
 			log.warn("download error " + request.getUrl(), e);
 		} finally {
@@ -140,7 +142,7 @@ public class DefaultHttpDownloader extends HttpDownloader {
         HttpUriRequest realRequest = (HttpUriRequest)context.getAttribute(HttpCoreContext.HTTP_REQUEST);
         return targetHost.toString() + realRequest.getURI().toString();
 	}
-
+	
 	/**
 	 * private final HttpContext setProxyIpAndTimeOut(HttpRequestBase method,int
 	 * timeout){ BasicHttpContext httpContext = new BasicHttpContext(); Builder

@@ -33,15 +33,9 @@ public class TaskError implements Writable{
 	
 	public String method = "";
 	
-	public Map<String,Object> runtimeContext = new HashMap<String,Object>(){
-
-		@Override
-		public void putAll(Map<? extends String, ? extends Object> m) {
-			m.remove("_content");
-			super.putAll(m);
-		}
-		
-	};
+	private String content = "";
+	
+	public Map<String,Object> runtimeContext = new HashMap<String,Object>();
 	
 	public TaskError(){}
 
@@ -69,6 +63,7 @@ public class TaskError implements Writable{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((errorType == null) ? 0 : errorType.hashCode());
+		result = prime * result + ((exceptionClass == null) ? 0 : exceptionClass.hashCode());
 		result = prime * result + firstNativeLineNumber;
 		return result;
 	}
@@ -87,6 +82,11 @@ public class TaskError implements Writable{
 				return false;
 		} else if (!errorType.equals(other.errorType))
 			return false;
+		if (exceptionClass == null) {
+			if (other.exceptionClass != null)
+				return false;
+		} else if (!exceptionClass.equals(other.exceptionClass))
+			return false;
 		if (firstNativeLineNumber != other.firstNativeLineNumber)
 			return false;
 		return true;
@@ -94,6 +94,9 @@ public class TaskError implements Writable{
 
 	@Override
 	public void write(DataOutput out) throws IOException {
+		if (runtimeContext.containsKey("_content")){
+			content = (String) runtimeContext.remove("_content");
+		}
 		out.writeUTF(taskname);
 		out.writeUTF(taskid);
 		out.writeLong(time.getTime());
@@ -103,6 +106,9 @@ public class TaskError implements Writable{
 		out.writeInt(firstNativeLineNumber);
 		out.writeUTF(JSON.toJSONString(runtimeContext));
 		out.writeUTF(method);
+		byte[] contentBytes = content.getBytes("UTF-8");
+		out.writeInt(contentBytes.length);
+		out.write(contentBytes);
 	}
 
 	@Override
@@ -116,6 +122,11 @@ public class TaskError implements Writable{
 		firstNativeLineNumber = in.readInt();
 		runtimeContext = JSON.parseObject(in.readUTF(), Map.class);
 		method = in.readUTF();
+		int contentBytesLen = in.readInt();
+		byte[] contentBytes = new byte[contentBytesLen];
+		in.readFully(contentBytes);
+		content = new String(contentBytes, "UTF-8");
+		runtimeContext.put("_content", content);
 	}
 	
 }

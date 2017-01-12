@@ -16,7 +16,7 @@ public interface DownloadProtocol extends VersionedProtocol {
 	
 	void resubmitTaskConfig(String taskId,int thread,Task config) throws DownloadException;
 	
-	boolean isWaitRequest(String taskId) throws DownloadException;
+	boolean isWorking(String taskId) throws DownloadException;
 	
 	void stopDownloadTracker(String taskId) throws DownloadException;
 	

@@ -21,6 +21,8 @@ public class HttpResponse {
 	
 	protected String ownerUrl;
 	
+	protected boolean isRedirected;
+	
 	public HttpResponse(){}
 	
 	public HttpResponse(HttpRequest basicRequest, org.apache.http.HttpResponse response) {
@@ -85,6 +87,21 @@ public class HttpResponse {
 
 	public void setOwnerUrl(String ownerUrl) {
 		this.ownerUrl = ownerUrl;
+	}
+	
+	public boolean isRedirected() {
+		return isRedirected;
+	}
+
+	public void setRedirected(boolean isRedirected) {
+		this.isRedirected = isRedirected;
+	}
+
+	public String getRedirectUrl(){
+		if (isRedirected){
+			return ownerUrl;
+		}
+		return "";
 	}
 	
 }

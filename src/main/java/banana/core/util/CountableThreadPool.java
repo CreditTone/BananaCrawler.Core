@@ -97,4 +97,22 @@ public class CountableThreadPool implements Closeable{
 				e.printStackTrace();
 			}
 		}
+		
+		public static void main(String[] args) throws Exception {
+			CountableThreadPool pool = new CountableThreadPool(10);
+			pool.execute(new Runnable() {
+				
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			});
+			Thread.sleep(100);
+			System.out.println(pool.executorService.getActiveCount());
+		}
 }
