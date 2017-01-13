@@ -11,6 +11,8 @@ import banana.core.exception.CrawlerMasterException;
 import banana.core.modle.BasicWritable;
 import banana.core.modle.CommandResponse;
 import banana.core.modle.MasterConfig;
+import banana.core.modle.PreparedTask;
+import banana.core.modle.Task;
 import banana.core.modle.TaskError;
 import banana.core.modle.TaskStatus;
 import banana.core.request.Cookies;
@@ -53,5 +55,5 @@ public interface MasterProtocol extends VersionedProtocol{
 	
 	void putTaskContextAttribute(String taskid,String attribute,BasicWritable value) throws Exception;
 	
-	BooleanWritable taskContextIsEmpty(String taskid);
+	void putGlobalContext(String attribute,BasicWritable value) throws Exception;
 }

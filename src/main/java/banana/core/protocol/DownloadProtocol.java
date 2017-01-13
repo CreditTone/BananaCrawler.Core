@@ -6,6 +6,7 @@ import org.apache.hadoop.ipc.VersionedProtocol;
 
 import banana.core.NodeStatus;
 import banana.core.exception.DownloadException;
+import banana.core.modle.Task;
 import banana.core.request.Cookies;
 
 public interface DownloadProtocol extends VersionedProtocol {

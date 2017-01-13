@@ -6,10 +6,12 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
 
+import com.alibaba.fastjson.JSON;
+
 public class BasicWritable implements Writable {
 	
 	public static enum BasicType {
-		INT,DOUBLE,SHORT,FLOAT,STRING,BOOLEAN,BYTE
+		INT,DOUBLE,SHORT,FLOAT,STRING,BOOLEAN,BYTE,JSON
 	}
 	
 	private BasicType basicType;
@@ -63,6 +65,8 @@ public class BasicWritable implements Writable {
 			this.basicType = BasicType.BOOLEAN;
 		}else if(value instanceof Float){
 			this.basicType = BasicType.FLOAT;
+		}else if (value instanceof JSON){
+			this.basicType = BasicType.JSON;
 		}else{
 			throw new Exception("not supported type" + value.getClass());
 		}
@@ -98,6 +102,9 @@ public class BasicWritable implements Writable {
 		case DOUBLE:
 			out.writeDouble((double) value);
 			break;
+		case JSON:
+			out.writeUTF(JSON.toJSONString(value));
+			break;
 		}
 	}
 
@@ -125,6 +132,9 @@ public class BasicWritable implements Writable {
 			break;
 		case DOUBLE:
 			value = in.readDouble();
+			break;
+		case JSON:
+			value = JSON.parse(in.readUTF());
 			break;
 		}
 	}

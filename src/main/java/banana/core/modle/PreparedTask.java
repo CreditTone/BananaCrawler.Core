@@ -1,4 +1,4 @@
-package banana.core.protocol;
+package banana.core.modle;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,8 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 
 import banana.core.BytesWritable;
-import banana.core.protocol.Task.Seed;
-import banana.core.protocol.Task.SeedQuery;
+import banana.core.modle.Task.Seed;
 import banana.core.request.Cookie;
 import banana.core.request.Cookies;
 

@@ -1,4 +1,4 @@
-package banana.core.protocol;
+package banana.core.modle;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -92,6 +92,8 @@ public final class Task implements Writable, Cloneable {
 		public Map<String, Object> page_context;
 
 		public Map<String, Object> task_context;
+		
+		public Map<String, Object> global_context;
 
 		public List<BlockCondition> blockConditions;
 
@@ -208,9 +210,10 @@ public final class Task implements Writable, Cloneable {
 	public SeedQuery seed_query;
 
 	public Mode mode;
-
+	
 	public boolean allow_multi_task;
 
+	public String condition;
 	/**
 	 * 页面处理器
 	 */
@@ -233,6 +236,7 @@ public final class Task implements Writable, Cloneable {
 		out.writeInt(thread);
 		out.writeBoolean(synchronizeLinks);
 		out.writeBoolean(allow_multi_task);
+		out.writeUTF(condition == null ? "" : condition);
 		out.writeUTF(filter == null ? "" : filter);
 		String queueJson = JSON.toJSONString(queue == null ? new HashMap<String, Object>() : queue);
 		String seedJson = JSON.toJSONString(seeds == null ? new ArrayList<Seed>() : seeds);
@@ -256,6 +260,7 @@ public final class Task implements Writable, Cloneable {
 		thread = in.readInt();
 		synchronizeLinks = in.readBoolean();
 		allow_multi_task = in.readBoolean();
+		condition = in.readUTF();
 		filter = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();

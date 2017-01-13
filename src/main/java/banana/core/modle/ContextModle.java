@@ -11,4 +11,6 @@ public interface ContextModle extends Map<String, Object> {
 	
 	public void copyTo(Map<String,Object> dst);
 	
+	public boolean existPath(String path);
+	
 }
