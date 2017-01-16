@@ -50,7 +50,7 @@ public class ExpandHandlebars extends Handlebars {
 
 			public Object apply(Object context, Options options) throws IOException {
 				int product = Integer.parseInt(options.param(0).toString());
-				int p0 ;
+				int p0;
 				for (int i = 1; i < options.params.length; i++) {
 					p0 = Integer.parseInt(options.param(i).toString());
 					product *= p0;
@@ -61,63 +61,78 @@ public class ExpandHandlebars extends Handlebars {
 		registerHelper("gt", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
-				float p0 = Float.parseFloat(((Object)options.param(0)).toString());
-				if (options.param(1) == null){
-					return false;
+				try {
+					float p0 = Float.parseFloat(((Object) options.param(0)).toString());
+					if (options.param(1) == null) {
+						return false;
+					}
+					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
+					return p0 > p1;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				float p1 = Float.parseFloat(((Object)options.param(1)).toString());
-				return p0 > p1;
+				return false;
 			}
 		});
 		registerHelper("lt", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
-				float p0 = Float.parseFloat(((Object)options.param(0)).toString());
-				if (options.param(1) == null){
-					return false;
+				try {
+					float p0 = Float.parseFloat(((Object) options.param(0)).toString());
+					if (options.param(1) == null) {
+						return false;
+					}
+					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
+					return p0 < p1;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				float p1 = Float.parseFloat(((Object)options.param(1)).toString());
-				return p0 < p1;
+				return false;
 			}
 		});
 		registerHelper("eq", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
-				Object s1 = options.param(0);
-				Object s2 = options.param(1);
-				if (s1 == null || s2 == null){
-					return false;
+				try {
+					Object s1 = options.param(0);
+					Object s2 = options.param(1);
+					if (s1 == null || s2 == null) {
+						return false;
+					}
+					return s1.equals(s2);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				return s1.equals(s2);
+				return true;
 			}
 		});
 		registerHelper("fixKey", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
 				String url = options.param(0);
-				if (!url.contains("?")){
+				if (!url.contains("?")) {
 					return url;
 				}
-				String[] urlData  = url.split("\\?");
+				String[] urlData = url.split("\\?");
 				String baseUrl = urlData[0];
-				String querys  = urlData[1];
+				String querys = urlData[1];
 				List<NameValuePair> pair = URLEncodedUtils.parse(querys);
 				for (int i = 1; i < options.params.length; i++) {
 					for (NameValuePair nvPair : pair) {
-						if (nvPair.getName().equals(options.param(i))){
+						if (nvPair.getName().equals(options.param(i))) {
 							pair.remove(nvPair);
 							break;
 						}
 					}
 				}
 				baseUrl += "?";
-				if (!pair.isEmpty()){
+				if (!pair.isEmpty()) {
 					Iterator<NameValuePair> iter = pair.iterator();
 					NameValuePair nvPair = null;
-					while(iter.hasNext()){
+					while (iter.hasNext()) {
 						nvPair = iter.next();
 						baseUrl += nvPair.getName() + "=" + nvPair.getValue();
-						if (iter.hasNext()){
+						if (iter.hasNext()) {
 							baseUrl += "&";
 						}
 					}
@@ -130,13 +145,43 @@ public class ExpandHandlebars extends Handlebars {
 			public Object apply(Object context, Options options) throws IOException {
 				String content = options.param(0);
 				String value = options.param(1);
-				if (content.contains(value)){
+				if (content.contains(value)) {
 					return true;
 				}
-				if (Pattern.compile(value).matcher(content).find()){
+				if (Pattern.compile(value).matcher(content).find()) {
 					return true;
 				}
 				return false;
+			}
+
+		});
+		registerHelper("or", new Helper<Object>() {
+
+			@Override
+			public Object apply(Object context, Options options) throws IOException {
+				boolean result = false;
+				for (int i = 0; i < options.params.length; i++) {
+					result = result || (Boolean)options.param(i);
+					if (result){
+						return true;
+					}
+				}
+				return result;
+			}
+			
+		});
+		registerHelper("and", new Helper<Object>() {
+
+			@Override
+			public Object apply(Object context, Options options) throws IOException {
+				boolean result = true;
+				for (int i = 0; i < options.params.length; i++) {
+					result = result && (Boolean)options.param(i);
+					if (!result){
+						return false;
+					}
+				}
+				return result;
 			}
 			
 		});
@@ -150,16 +195,16 @@ public class ExpandHandlebars extends Handlebars {
 		registerHelper("for", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
-				List<Map<String,Object>> result = new ArrayList<Map<String,Object>>();
+				List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
 				String key = options.param(0);
 				int start = Integer.parseInt(options.param(1).toString());
 				int end = Integer.parseInt(options.param(2).toString());
-				Map<String,Object> dataDef = (Map<String, Object>) options.context.model();
-				Map<String,Object> iter_context = new HashMap<>();
+				Map<String, Object> dataDef = (Map<String, Object>) options.context.model();
+				Map<String, Object> iter_context = new HashMap<>();
 				for (int i = start; i < end; i++) {
 					iter_context.put(key, i);
-					Map<String,Object> item = new HashMap<String,Object>();
-					for (Entry<String,Object> def : dataDef.entrySet()) {
+					Map<String, Object> item = new HashMap<String, Object>();
+					for (Entry<String, Object> def : dataDef.entrySet()) {
 						Template template = ExpandHandlebars.this.compileInline(def.getValue().toString());
 						item.put(def.getKey(), template.apply(iter_context));
 					}
@@ -170,23 +215,22 @@ public class ExpandHandlebars extends Handlebars {
 			}
 		});
 	}
-	
+
 	public Template compileEscapeInline(String input) throws IOException {
 		return new EscapeTemplate(super.compileInline(input));
 	}
-	
-	public String escapeParse(String input,Map<String,Object> context) throws IOException{
+
+	public String escapeParse(String input, Map<String, Object> context) throws IOException {
 		Template template = compileEscapeInline(input);
 		return template.apply(context);
 	}
-	
 
-	public List<Map<String,Object>> toFor(Map<String,Object> iterDef) throws IOException{
-		iterDef = new HashMap<String,Object>(iterDef);
+	public List<Map<String, Object>> toFor(Map<String, Object> iterDef) throws IOException {
+		iterDef = new HashMap<String, Object>(iterDef);
 		String forDef = (String) iterDef.remove("for");
 		Template template = compileInline(forDef);
 		template.apply(iterDef);
 		return (List<Map<String, Object>>) iterDef.remove("_data");
-	} 
-	
+	}
+
 }

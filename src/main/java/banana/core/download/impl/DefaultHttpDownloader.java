@@ -94,6 +94,7 @@ public class DefaultHttpDownloader extends HttpDownloader {
 		} catch (Exception e) {
 			page = new Page();
 			page.setStatus(500);
+			page.setRequest(request);
 			page.setDriverId(String.valueOf(client.hashCode()));
 			log.warn("download error " + request.getUrl(), e);
 		} finally {
