@@ -1,21 +1,14 @@
 package banana.core.processor;
 
 import java.util.List;
-import java.util.Map;
-
 import banana.core.modle.ContextModle;
 import banana.core.modle.CrawlData;
 import banana.core.request.HttpRequest;
 import banana.core.response.Page;
+import banana.core.response.StreamResponse;
 
 
-/**
- * PageProcessor是所有PageRequest请求完成后处理的接口。
- * 例如：startContext.createPageRequest("http://my.oschina.net/u/1377701/blog/425984",OschinaProcessor.class)即可指定处理页面结果
- * 此时重写Processor.process方法即可完成解析工作
- *
- */
-public interface PageProcessor {
+public interface DownloadProcessor {
 	
 	/**
 	 * 处理一个页面
@@ -26,6 +19,7 @@ public interface PageProcessor {
 	 */
 	public ContextModle process(Page page, Object taskContext,List<HttpRequest> queue,List<CrawlData> objectContainer)throws Exception; 
 	
+	public ContextModle process(StreamResponse stream,Object taskContext,List<HttpRequest> queue,List<CrawlData> objectContainer) throws Exception;
 }
 
 

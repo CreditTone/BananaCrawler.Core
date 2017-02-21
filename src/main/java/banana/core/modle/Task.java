@@ -115,15 +115,12 @@ public final class Task implements Writable, Cloneable {
 		public CrawlerData[] crawler_data;
 
 		public Forwarder[] forwarders;
-
-	}
-
-	public static class DownloadProcessor {
-
-		public String index;
-
-		public Map<String, String>[] files;
-
+		
+		
+		//文件处理配置
+		public boolean zip;
+		
+		public HashMap csv_data;
 	}
 
 	public static final class Mode {
@@ -168,7 +165,7 @@ public final class Task implements Writable, Cloneable {
 		}
 		if (seeds != null) {
 			for (Seed seed : seeds) {
-				if (seed.url == null && seed.urls == null && seed.url_iterator == null) {
+				if (seed.url == null && seed.urls == null && seed.url_iterator == null && seed.download == null && seed.downloads == null) {
 					throw new NullPointerException("seed url cannot be null");
 				}
 				if (seed.processor == null) {
@@ -219,11 +216,6 @@ public final class Task implements Writable, Cloneable {
 	 */
 	public List<Processor> processors;
 
-	/**
-	 * 文件处理器
-	 */
-	public List<DownloadProcessor> download_processors;
-
 	public String data;
 
 	public boolean synchronizeLinks;
@@ -243,13 +235,11 @@ public final class Task implements Writable, Cloneable {
 		String seedQueryJson = seed_query == null ? "{}" : JSON.toJSONString(seed_query);
 		String modeJson = mode == null ? "{}" : JSON.toJSONString(mode);
 		String processorJson = JSON.toJSONString(processors);
-		String downloadProcessorJson = download_processors == null ? "[]" : JSON.toJSONString(download_processors);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
 		out.writeUTF(seedQueryJson);
 		out.writeUTF(modeJson);
 		out.writeUTF(processorJson);
-		out.writeUTF(downloadProcessorJson);
 	}
 
 	@Override
@@ -267,7 +257,6 @@ public final class Task implements Writable, Cloneable {
 		String seedQueryJson = in.readUTF();
 		String modeJson = in.readUTF();
 		String processorJson = in.readUTF();
-		String downloadProcessorJson = in.readUTF();
 
 		queue = JSON.parseObject(queueJson, Map.class);
 
@@ -291,13 +280,6 @@ public final class Task implements Writable, Cloneable {
 		for (int i = 0; i < array.size(); i++) {
 			Processor processor = JSON.parseObject(array.getJSONObject(i).toString(), Processor.class);
 			processors.add(processor);
-		}
-
-		download_processors = new ArrayList<DownloadProcessor>();
-		array = JSONArray.parseArray(downloadProcessorJson);
-		for (int i = 0; i < array.size(); i++) {
-			DownloadProcessor processor = JSON.parseObject(array.getJSONObject(i).toString(), DownloadProcessor.class);
-			download_processors.add(processor);
 		}
 
 	}
