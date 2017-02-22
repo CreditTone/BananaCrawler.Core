@@ -28,13 +28,18 @@ public class HttpResponse {
 	public HttpResponse(HttpRequest basicRequest, org.apache.http.HttpResponse response) {
 		setStatus(response.getStatusLine().getStatusCode());
 		setRequest(basicRequest);
-		setContentType(response.getEntity().getContentType().getValue());
-		Header []headers = response.getAllHeaders();
-		Map<String,String> headerCopy = new HashMap<String,String>();
-		for (int i = 0; i < headers.length; i++) {
-			headerCopy.put(headers[i].getName(), headers[i].getValue());
+		Header contentType = response.getEntity().getContentType();
+		if (contentType != null){
+			setContentType(contentType.getValue());
 		}
-		setResponseHeader(headerCopy);
+		Header []headers = response.getAllHeaders();
+		if (headers != null){
+			Map<String,String> headerCopy = new HashMap<String,String>();
+			for (int i = 0; i < headers.length; i++) {
+				headerCopy.put(headers[i].getName(), headers[i].getValue());
+			}
+			setResponseHeader(headerCopy);
+		}
 	}
 	
 	public int getStatus(){
