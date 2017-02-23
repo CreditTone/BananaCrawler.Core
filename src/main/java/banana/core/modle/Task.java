@@ -17,6 +17,32 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 
 public final class Task implements Writable, Cloneable {
+	
+	public static class GlobalSeed {
+		/**
+		 * 任务的初始种子
+		 */
+		public static class Init {
+			
+			public List<Seed> seeds;
+
+			public SeedQuery seed_query;
+		}
+		
+		/**
+		 * 任务完成后需要执行的种子
+		 */
+		public static class After {
+			
+			public List<Seed> seeds;
+			
+			public SeedQuery seed_query;
+		}
+		
+		public Init init;
+		
+		public After after;
+	}
 
 	public static class Seed {
 
@@ -155,26 +181,8 @@ public final class Task implements Writable, Cloneable {
 			}
 			indexs.add(processor.index);
 		}
-		if (seed_query == null && (seeds == null || seeds.isEmpty())) {
+		if (seed == null) {
 			throw new Exception("There is no seed");
-		}
-		if (seed_query != null) {
-			if (!indexs.contains(seed_query.processor)) {
-				throw new IllegalArgumentException("processor " + seed_query.processor + " does not exist");
-			}
-		}
-		if (seeds != null) {
-			for (Seed seed : seeds) {
-				if (seed.url == null && seed.urls == null && seed.url_iterator == null && seed.download == null && seed.downloads == null) {
-					throw new NullPointerException("seed url cannot be null");
-				}
-				if (seed.processor == null) {
-					throw new NullPointerException("seed processor cannot be null");
-				}
-				if (!indexs.contains(seed.processor)) {
-					throw new IllegalArgumentException("processor " + seed.processor + " does not exist");
-				}
-			}
 		}
 		if (thread <= 0) {
 			throw new IllegalArgumentException("the number of threads must be greater than zero");
@@ -190,6 +198,8 @@ public final class Task implements Writable, Cloneable {
 	public String name;
 
 	public String collection;
+	
+	public GlobalSeed seed;
 
 	public String downloader = "default";
 
@@ -198,13 +208,6 @@ public final class Task implements Writable, Cloneable {
 	public Map<String, Object> queue;
 
 	public String filter;
-
-	/**
-	 * 任务的初始种子
-	 */
-	public List<Seed> seeds;
-
-	public SeedQuery seed_query;
 
 	public Mode mode;
 	
@@ -231,13 +234,11 @@ public final class Task implements Writable, Cloneable {
 		out.writeUTF(condition == null ? "" : condition);
 		out.writeUTF(filter == null ? "" : filter);
 		String queueJson = JSON.toJSONString(queue == null ? new HashMap<String, Object>() : queue);
-		String seedJson = JSON.toJSONString(seeds == null ? new ArrayList<Seed>() : seeds);
-		String seedQueryJson = seed_query == null ? "{}" : JSON.toJSONString(seed_query);
+		String seedJson = JSON.toJSONString(seed);
 		String modeJson = mode == null ? "{}" : JSON.toJSONString(mode);
 		String processorJson = JSON.toJSONString(processors);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
-		out.writeUTF(seedQueryJson);
 		out.writeUTF(modeJson);
 		out.writeUTF(processorJson);
 	}
@@ -254,29 +255,19 @@ public final class Task implements Writable, Cloneable {
 		filter = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
-		String seedQueryJson = in.readUTF();
 		String modeJson = in.readUTF();
 		String processorJson = in.readUTF();
 
 		queue = JSON.parseObject(queueJson, Map.class);
 
-		seeds = new ArrayList<Seed>();
-		JSONArray array = JSONArray.parseArray(seedJson);
-		for (int i = 0; i < array.size(); i++) {
-			Seed seed = JSON.parseObject(array.getJSONObject(i).toString(), Seed.class);
-			seeds.add(seed);
-		}
-
-		if (!seedQueryJson.equals("{}")) {
-			seed_query = JSON.parseObject(seedQueryJson, SeedQuery.class);
-		}
+		seed = JSON.parseObject(seedJson, GlobalSeed.class);
 
 		if (!modeJson.equals("{}")) {
 			mode = JSON.parseObject(modeJson, Mode.class);
 		}
 
 		processors = new ArrayList<Processor>();
-		array = JSONArray.parseArray(processorJson);
+		JSONArray array = JSONArray.parseArray(processorJson);
 		for (int i = 0; i < array.size(); i++) {
 			Processor processor = JSON.parseObject(array.getJSONObject(i).toString(), Processor.class);
 			processors.add(processor);
