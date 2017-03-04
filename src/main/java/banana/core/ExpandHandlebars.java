@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
+import org.apache.log4j.Logger;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
@@ -21,6 +22,8 @@ import com.github.jknack.handlebars.Template;
 import banana.core.util.URLEncodedUtils;
 
 public class ExpandHandlebars extends Handlebars {
+	
+	private static Logger logger = Logger.getLogger(ExpandHandlebars.class);
 
 	public ExpandHandlebars() {
 		registerHelper("add", new Helper<Object>() {
@@ -69,7 +72,7 @@ public class ExpandHandlebars extends Handlebars {
 					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
 					return p0 > p1;
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.warn(e.getMessage() + "好像有东西没解析到哦");
 				}
 				return false;
 			}
@@ -85,7 +88,7 @@ public class ExpandHandlebars extends Handlebars {
 					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
 					return p0 < p1;
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.warn(e.getMessage() + "好像有东西没解析到哦");
 				}
 				return false;
 			}
@@ -101,7 +104,7 @@ public class ExpandHandlebars extends Handlebars {
 					}
 					return s1.equals(s2);
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.warn(e.getMessage() + "好像有东西没解析到哦");
 				}
 				return true;
 			}
