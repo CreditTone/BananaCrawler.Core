@@ -72,7 +72,7 @@ public class ExpandHandlebars extends Handlebars {
 					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
 					return p0 > p1;
 				} catch (Exception e) {
-					logger.warn(e.getMessage() + "好像有东西没解析到哦");
+					logger.warn(options.context.model() + e.getMessage() + ",好像有东西没解析到哦");
 				}
 				return false;
 			}
@@ -88,7 +88,7 @@ public class ExpandHandlebars extends Handlebars {
 					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
 					return p0 < p1;
 				} catch (Exception e) {
-					logger.warn(e.getMessage() + "好像有东西没解析到哦");
+					logger.warn(options.context.model() + e.getMessage() + ",好像有东西没解析到哦");
 				}
 				return false;
 			}
@@ -104,7 +104,7 @@ public class ExpandHandlebars extends Handlebars {
 					}
 					return s1.equals(s2);
 				} catch (Exception e) {
-					logger.warn(e.getMessage() + "好像有东西没解析到哦");
+					logger.warn(options.context.model() + e.getMessage() + ",好像有东西没解析到哦");
 				}
 				return true;
 			}
