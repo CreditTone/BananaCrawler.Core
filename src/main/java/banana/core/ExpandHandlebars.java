@@ -3,6 +3,7 @@ package banana.core;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -191,8 +192,22 @@ public class ExpandHandlebars extends Handlebars {
 		registerHelper("date", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
+				Calendar calendar = Calendar.getInstance();
 				String format = options.param(0);
-				return new SimpleDateFormat(format).format(new Date());
+				if (options.params.length > 2){
+					Integer addYears = options.param(1);
+					Integer addMonths = options.param(2);
+					Integer addDays = options.param(3);
+					calendar.add(Calendar.YEAR, addYears);
+					calendar.add(Calendar.MONTH, addMonths);
+					calendar.add(Calendar.DAY_OF_MONTH, addDays);
+				}
+				if (format.equalsIgnoreCase("TimeMillis")){
+					return calendar.getTimeInMillis();
+				}else if (format.equalsIgnoreCase("Microseconds")){
+					return calendar.getTimeInMillis() * 1000;
+				}
+				return new SimpleDateFormat(format).format(new Date(calendar.getTimeInMillis()));
 			}
 		});
 		registerHelper("for", new Helper<Object>() {
