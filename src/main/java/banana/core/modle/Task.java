@@ -160,12 +160,12 @@ public final class Task implements Writable, Cloneable {
 	public void verify() throws Exception {
 		if (name == null || name.trim().equals("")) {
 			throw new NullPointerException("task name cannot be null");
-		} else if (name.contains("_")) {
-			throw new IllegalArgumentException("name cannot contain underscore symbols");
+		} else if (name.contains("&")) {
+			throw new IllegalArgumentException("name cannot contain underscore symbols &");
 		}
 		if (collection == null || collection.trim().equals("")) {
 			throw new NullPointerException("task collection cannot be null");
-		} else if (collection.contains("_")) {
+		} else if (collection.contains("&")) {
 			throw new IllegalArgumentException("collection cannot contain underscore symbols");
 		}
 		if (!Arrays.asList("default", "phantomjs", "htmlunit").contains(downloader)) {
@@ -222,6 +222,8 @@ public final class Task implements Writable, Cloneable {
 	public String data;
 
 	public boolean synchronizeLinks;
+	
+	public String encoding;
 
 	@Override
 	public void write(DataOutput out) throws IOException {
@@ -233,6 +235,7 @@ public final class Task implements Writable, Cloneable {
 		out.writeBoolean(allow_multi_task);
 		out.writeUTF(condition == null ? "" : condition);
 		out.writeUTF(filter == null ? "" : filter);
+		out.writeUTF(encoding == null ? "" : encoding);
 		String queueJson = JSON.toJSONString(queue == null ? new HashMap<String, Object>() : queue);
 		String seedJson = JSON.toJSONString(seed);
 		String modeJson = mode == null ? "{}" : JSON.toJSONString(mode);
@@ -253,6 +256,7 @@ public final class Task implements Writable, Cloneable {
 		allow_multi_task = in.readBoolean();
 		condition = in.readUTF();
 		filter = in.readUTF();
+		encoding = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
 		String modeJson = in.readUTF();

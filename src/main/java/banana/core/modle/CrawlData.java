@@ -33,7 +33,7 @@ public class CrawlData implements Serializable{
 	public CrawlData(String taskId, String link, DBObject data,DBObject updateQuery) {
 		super();
 		this.taskId = taskId;
-		this.taskName = taskId.split("_")[0];
+		this.taskName = taskId.substring(0,taskId.length()-18);
 		this.link = link;
 		this.crawlTime = new Date();
 		this.updateQuery = updateQuery;
@@ -78,5 +78,4 @@ public class CrawlData implements Serializable{
 		return "CrawlData [taskId=" + taskId + ", link=" + link + ", crawlTime=" + crawlTime + ", data=" + data
 				+ "]";
 	}
-
 }
