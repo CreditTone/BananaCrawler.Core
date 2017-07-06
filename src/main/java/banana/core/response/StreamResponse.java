@@ -1,10 +1,10 @@
 package banana.core.response;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import banana.core.request.BinaryRequest;
 import banana.core.request.HttpRequest;
 
 public class StreamResponse extends HttpResponse {
@@ -13,12 +13,22 @@ public class StreamResponse extends HttpResponse {
 		super(basicRequest, response);
 		setIn(response.getEntity().getContent());
 	}
+	
+	
 
 	protected byte[] body;
 
 	public byte[] getBody() {
 		return body;
 	}
+	
+
+	@Override
+	public BinaryRequest getRequest() {
+		return (BinaryRequest) super.getRequest();
+	}
+
+
 
 	public void setIn(InputStream in) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

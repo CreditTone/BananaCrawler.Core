@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.http.NameValuePair;
 
@@ -16,6 +17,7 @@ public final class RequestBuilder {
 	private byte[] requestBody;
 	private String url;
 	private String download;
+	private String downloadPath;
 	private Method method = Method.GET;
 	private String processor;
 	private PageEncoding pageEncoding;
@@ -37,7 +39,12 @@ public final class RequestBuilder {
     }
     
     public RequestBuilder setDownload(String download) {
+    	return setDownload(download, UUID.randomUUID().toString());
+    }
+    
+    public RequestBuilder setDownload(String download,String downloadPath) {
     	this.download = download;
+    	this.downloadPath = downloadPath;
     	return this;
     }
     
@@ -78,7 +85,7 @@ public final class RequestBuilder {
         			((PageRequest)ret).setPageEncoding(pageEncoding);
         		}
     		}else{
-    			ret = new BinaryRequest(normalUrl(download), processor);
+    			ret = new BinaryRequest(normalUrl(download), downloadPath);
     		}
     		ret.setMethod(method);
     		if(priority >=0 && priority<=1000){

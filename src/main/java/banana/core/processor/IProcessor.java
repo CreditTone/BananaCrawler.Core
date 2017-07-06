@@ -4,11 +4,10 @@ import java.util.List;
 import banana.core.modle.ContextModle;
 import banana.core.modle.CrawlData;
 import banana.core.request.HttpRequest;
-import banana.core.response.Page;
-import banana.core.response.StreamResponse;
+import banana.core.response.HttpResponse;
 
 
-public interface DownloadProcessor {
+public interface IProcessor {
 	
 	/**
 	 * 处理一个页面
@@ -17,9 +16,8 @@ public interface DownloadProcessor {
 	 * @param queue  加入跟进Request的List容器，处理完成后queue的所有Request会被推送到抓取队列中
 	 * @throws Exception 
 	 */
-	public ContextModle process(Page page, Object taskContext,List<HttpRequest> queue,List<CrawlData> objectContainer)throws Exception; 
+	public ContextModle process(HttpResponse response, Object taskContext,List<HttpRequest> queue,List<CrawlData> objectContainer)throws Exception; 
 	
-	public ContextModle process(StreamResponse stream,Object taskContext,List<HttpRequest> queue,List<CrawlData> objectContainer) throws Exception;
 }
 
 

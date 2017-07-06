@@ -142,11 +142,6 @@ public final class Task implements Writable, Cloneable {
 
 		public Forwarder[] forwarders;
 		
-		
-		//文件处理配置
-		public boolean zip;
-		
-		public HashMap csv_data;
 	}
 
 	public static final class Mode {
@@ -224,6 +219,8 @@ public final class Task implements Writable, Cloneable {
 	public boolean synchronizeLinks;
 	
 	public String encoding;
+	
+	public String download_root;
 
 	@Override
 	public void write(DataOutput out) throws IOException {
@@ -236,6 +233,7 @@ public final class Task implements Writable, Cloneable {
 		out.writeUTF(condition == null ? "" : condition);
 		out.writeUTF(filter == null ? "" : filter);
 		out.writeUTF(encoding == null ? "" : encoding);
+		out.writeUTF(download_root == null ? "" : download_root);
 		String queueJson = JSON.toJSONString(queue == null ? new HashMap<String, Object>() : queue);
 		String seedJson = JSON.toJSONString(seed);
 		String modeJson = mode == null ? "{}" : JSON.toJSONString(mode);
@@ -257,6 +255,7 @@ public final class Task implements Writable, Cloneable {
 		condition = in.readUTF();
 		filter = in.readUTF();
 		encoding = in.readUTF();
+		download_root = in.readUTF();
 		String queueJson = in.readUTF();
 		String seedJson = in.readUTF();
 		String modeJson = in.readUTF();
