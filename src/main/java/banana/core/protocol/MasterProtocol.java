@@ -45,7 +45,9 @@ public interface MasterProtocol extends VersionedProtocol{
 	
 	HttpRequest pollTaskRequest(String taskId) throws CrawlerMasterException;
 	
-	BooleanWritable filterQuery(String taskId,String ... fields);
+	BooleanWritable filterQuery(String taskId,String fieldValue);
+	
+	void addFilterField(String taskId,String fieldValue);
 	
 	CommandResponse injectCookies(Cookies cookies,String taskId) throws Exception;
 	

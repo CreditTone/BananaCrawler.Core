@@ -16,6 +16,8 @@ import org.apache.hadoop.io.Writable;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 
+import banana.core.download.impl.HttpsProxy;
+
 public final class Task implements Writable, Cloneable {
 	
 	public static class GlobalSeed {
@@ -93,13 +95,7 @@ public final class Task implements Writable, Cloneable {
 
 	}
 
-	public static final class CrawlerRequest extends HashMap {
-	}
-
-	public static final class CrawlerData extends HashMap {
-	}
-
-	public static class BasicProcessor {
+	public static class PageProcessorConfig {
 
 		public static final class BlockCondition {
 
@@ -108,26 +104,7 @@ public final class Task implements Writable, Cloneable {
 			public String email;
 
 		}
-
-		public String index;
-
-		public Object content_prepare;
-
-		public boolean keep_down;
-
-		public Map<String, Object> page_context;
-
-		public Map<String, Object> task_context;
 		
-		public Map<String, Object> global_context;
-
-		public List<BlockCondition> blockConditions;
-
-		public String[] logs;
-	}
-
-	public static final class Processor extends BasicProcessor {
-
 		public static final class Forwarder {
 
 			public String condition;
@@ -136,12 +113,38 @@ public final class Task implements Writable, Cloneable {
 
 		}
 
-		public CrawlerRequest[] crawler_request;
+		public String index;
+		
+		public static class ContentPrepare {
+			public String _option;
+			public String _expression;
+		}
+		
+		public static class RetryCondition {
+			public List<String> or;
+			public List<String> and;
+			public int maxRetry;
+		}
 
-		public CrawlerData[] crawler_data;
+		public ContentPrepare content_prepare;
+
+		public HashMap<String, Object> page_context;
+
+		public HashMap<String, Object> task_context;
+		
+		public HashMap<String, Object> global_context;
+
+		public List<BlockCondition> blockConditions;
+		
+		public RetryCondition retry_condition;
+		
+		public HashMap<String, Object>[] crawler_request;
+
+		public HashMap<String, Object>[] crawler_data;
 
 		public Forwarder[] forwarders;
-		
+
+		public String[] logs;
 	}
 
 	public static final class Mode {
@@ -170,7 +173,7 @@ public final class Task implements Writable, Cloneable {
 			throw new Exception("There is no processors");
 		}
 		Set<String> indexs = new HashSet<String>();
-		for (Processor processor : processors) {
+		for (PageProcessorConfig processor : processors) {
 			if (processor.index == null) {
 				throw new NullPointerException("processor index cannot be null");
 			}
@@ -206,13 +209,15 @@ public final class Task implements Writable, Cloneable {
 
 	public Mode mode;
 	
+	public HttpsProxy proxy;
+	
 	public boolean allow_multi_task;
 
 	public String condition;
 	/**
 	 * 页面处理器
 	 */
-	public List<Processor> processors;
+	public List<PageProcessorConfig> processors;
 
 	public String data;
 
@@ -238,10 +243,12 @@ public final class Task implements Writable, Cloneable {
 		String seedJson = JSON.toJSONString(seed);
 		String modeJson = mode == null ? "{}" : JSON.toJSONString(mode);
 		String processorJson = JSON.toJSONString(processors);
+		String proxyJson = proxy == null ? "{}" : JSON.toJSONString(proxy);
 		out.writeUTF(queueJson);
 		out.writeUTF(seedJson);
 		out.writeUTF(modeJson);
 		out.writeUTF(processorJson);
+		out.writeUTF(proxyJson);
 	}
 
 	@Override
@@ -260,7 +267,7 @@ public final class Task implements Writable, Cloneable {
 		String seedJson = in.readUTF();
 		String modeJson = in.readUTF();
 		String processorJson = in.readUTF();
-
+		String proxyJson = in.readUTF();
 		queue = JSON.parseObject(queueJson, Map.class);
 
 		seed = JSON.parseObject(seedJson, GlobalSeed.class);
@@ -269,13 +276,17 @@ public final class Task implements Writable, Cloneable {
 			mode = JSON.parseObject(modeJson, Mode.class);
 		}
 
-		processors = new ArrayList<Processor>();
+		processors = new ArrayList<PageProcessorConfig>();
 		JSONArray array = JSONArray.parseArray(processorJson);
 		for (int i = 0; i < array.size(); i++) {
-			Processor processor = JSON.parseObject(array.getJSONObject(i).toString(), Processor.class);
+			PageProcessorConfig processor = JSON.parseObject(array.getJSONObject(i).toString(), PageProcessorConfig.class);
 			processors.add(processor);
 		}
-
+		
+		if (!proxyJson.equals("{}")) {
+			proxy = JSON.parseObject(proxyJson, HttpsProxy.class);
+		}
+		
 	}
 
 	public Object clone() {

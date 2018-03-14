@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.http.NameValuePair;
@@ -19,6 +20,9 @@ public final class RequestBuilder {
 	private String download;
 	private String downloadPath;
 	private Method method = Method.GET;
+	private Map<String,Object> headers;
+	private Map<String,Object> params;
+	private Map<String,Object> attribute;
 	private String processor;
 	private PageEncoding pageEncoding;
 	private int priority;
@@ -53,9 +57,24 @@ public final class RequestBuilder {
     	return this;
     }
     
-    public RequestBuilder setMethod(Method method) {
-    	this.method = method;
+    public RequestBuilder setHeaders(Map<String,Object> headers) {
+    	this.headers = headers;
     	return this;
+    }
+    
+    public RequestBuilder setParams(Map<String,Object> params) {
+    	this.params = params;
+    	return this;
+    }
+    
+    public RequestBuilder setAttribute(Map<String,Object> attribute) {
+    	this.attribute = attribute;
+    	return this;
+    }
+    
+    public RequestBuilder setMethod(Method method) {
+    		this.method = method;
+    		return this;
     }
     
     public RequestBuilder setPriority(int priority) {
@@ -73,7 +92,51 @@ public final class RequestBuilder {
     	return this;
     }
     
-    public HttpRequest build(){
+    public byte[] getRequestBody() {
+		return requestBody;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public String getDownload() {
+		return download;
+	}
+
+	public String getDownloadPath() {
+		return downloadPath;
+	}
+
+	public Method getMethod() {
+		return method;
+	}
+
+	public Map<String, Object> getHeaders() {
+		return headers;
+	}
+
+	public Map<String, Object> getParams() {
+		return params;
+	}
+
+	public Map<String, Object> getAttribute() {
+		return attribute;
+	}
+
+	public String getProcessor() {
+		return processor;
+	}
+
+	public PageEncoding getPageEncoding() {
+		return pageEncoding;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public HttpRequest build(){
     	HttpRequest ret = null;
     	if (requestBody != null){
     		PageRequest req = new PageRequest();
@@ -88,6 +151,21 @@ public final class RequestBuilder {
     			ret = new BinaryRequest(normalUrl(download), downloadPath);
     		}
     		ret.setMethod(method);
+    		if (headers != null) {
+    			for (Entry<String,Object> entry : headers.entrySet()) {
+    				ret.putHeader(entry.getKey(), (String) entry.getValue());
+    			}
+    		}
+    		if (params != null) {
+    			for (Entry<String,Object> entry : params.entrySet()) {
+    				ret.putParams(entry.getKey(), (String) entry.getValue());
+    			}
+    		}
+    		if (attribute != null) {
+    			for (Entry<String,Object> entry : attribute.entrySet()) {
+    				ret.addAttribute(entry.getKey(), entry.getValue());
+    			}
+    		}
     		if(priority >=0 && priority<=1000){
     			ret.setPriority(priority);
     		}else{

@@ -15,13 +15,6 @@ public class MasterConfig implements Writable {
 
 	public Integer handlers;
 
-	public static class Extractor {
-		public String host;
-		public Integer port;
-	}
-
-	public Extractor extractor;
-
 	public static class MongoDB {
 		public String host;
 		public Integer port;
@@ -57,7 +50,6 @@ public class MasterConfig implements Writable {
 		MasterConfig config = JSON.parseObject(in.readUTF(), MasterConfig.class);
 		this.listen = config.listen;
 		this.jdbc = config.jdbc;
-		this.extractor = config.extractor;
 		this.mongodb = config.mongodb;
 		this.password = config.password;
 		this.email = config.email;

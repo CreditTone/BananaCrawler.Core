@@ -2,6 +2,7 @@ package banana.core.download;
 
 import java.io.Closeable;
 
+import banana.core.download.impl.HttpsProxy;
 import banana.core.request.BinaryRequest;
 import banana.core.request.Cookies;
 import banana.core.request.PageRequest;
@@ -9,21 +10,23 @@ import banana.core.response.Page;
 import banana.core.response.StreamResponse;
 
 
-public abstract class HttpDownloader implements Closeable{
+public interface HttpDownloader extends Closeable{
 	
-    public abstract Page download(PageRequest request);
+    public Page download(PageRequest request);
     
-    public abstract StreamResponse downloadBinary(BinaryRequest request);
+    public StreamResponse downloadBinary(BinaryRequest request);
     
-    public abstract boolean supportJavaScript();
+    public boolean supportJavaScript();
     
-    public abstract void open();
+    public void open();
 
-    public abstract void setTimeout(int second);
+    public void setTimeout(int second);
     
-    public abstract void injectCookies(Cookies cookies);
+    public void setPorxy(HttpsProxy proxy);
     
-    public abstract Cookies getCookies();
+    public void injectCookies(Cookies cookies);
     
-    public abstract void blockDriver(String driverId);
+    public Cookies getCookies();
+    
+    public void blockDriver(String driverId);
 }
