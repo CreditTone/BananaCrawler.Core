@@ -70,17 +70,15 @@ public class Extractor {
 		proxy.setUsername("lum-customer-guozhong-zone-residential-country-cn-session-2896809615");
 		proxy.setPassword("74a3a5f2ce9f");
 		d.setPorxy(proxy);
-		HttpRequest httpRequest = RequestBuilder.custom().setUrl("https://s.taobao.com/api?app=api&callback=shopcard&m=get_shop_card&sid=3248437688").build();
-		String parse = "{\"sn\":\"title\",\"_input_type\":\"json\",\"dsr\":{\n" + 
-				"                        \"favorableRate\":\"favorableRate\",\n" + 
-				"                        \"matchDescription\":\"matchDescription\",\n" + 
-				"                        \"serviceAttitude\":\"serviceAttitude\",\n" + 
-				"                        \"deliverySpeed\":\"deliverySpeed\",\n" + 
-				"                        \"descriptionCompared\":\"descriptionCompared\",\n" + 
-				"                        \"attitudeCompared\":\"attitudeCompared\",\n" + 
-				"                        \"deliveryCompared\":\"deliveryCompared\"\n" + 
-				"                    }}";
-		String parse2 = "{\"_input_type\":\"json\",\"sn\":\"title\"}";
+		HttpRequest httpRequest = RequestBuilder.custom().setUrl("http://www.ebuy16.com/buy/zg/1055_1.html").build();
+		String parse = "{\"_output_type\":\"list\",\n" + 
+				"                    \"_root\":\"div.scc ul.other li\",\n" + 
+				"                    \"url\":\"a;href\"}";
+		String parse2 = "{\"shop_names\":{\n" + 
+				"                    \"_root\":\"div.shop_list li\",\n" + 
+				"                    \"_output_type\":\"list\",\n" + 
+				"                    \"shopname\":\"a\"\n" + 
+				"                }}";
 		String json = d.download((PageRequest) httpRequest).toString();
 		System.out.println(json);
 		Object v = Extractor.toDo(json, parse, null);

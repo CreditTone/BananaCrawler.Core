@@ -154,6 +154,11 @@ public final class Task implements Writable, Cloneable {
 		public boolean prepared;
 
 	}
+	
+	public static class FilterConfig {
+		public String type;
+		public String store;
+	}
 
 	public void verify() throws Exception {
 		if (name == null || name.trim().equals("")) {
@@ -205,7 +210,7 @@ public final class Task implements Writable, Cloneable {
 
 	public Map<String, Object> queue;
 
-	public String filter;
+	public FilterConfig filter;
 
 	public Mode mode;
 	
@@ -221,7 +226,7 @@ public final class Task implements Writable, Cloneable {
 
 	public String data;
 
-	public boolean synchronizeLinks;
+	public boolean reset;
 	
 	public String encoding;
 	
@@ -233,10 +238,10 @@ public final class Task implements Writable, Cloneable {
 		out.writeUTF(collection);
 		out.writeUTF(downloader);
 		out.writeInt(thread);
-		out.writeBoolean(synchronizeLinks);
+		out.writeBoolean(reset);
 		out.writeBoolean(allow_multi_task);
 		out.writeUTF(condition == null ? "" : condition);
-		out.writeUTF(filter == null ? "" : filter);
+		out.writeUTF(filter == null ? "{}" : JSON.toJSONString(filter));
 		out.writeUTF(encoding == null ? "" : encoding);
 		out.writeUTF(download_root == null ? "" : download_root);
 		String queueJson = JSON.toJSONString(queue == null ? new HashMap<String, Object>() : queue);
@@ -257,10 +262,13 @@ public final class Task implements Writable, Cloneable {
 		collection = in.readUTF();
 		downloader = in.readUTF();
 		thread = in.readInt();
-		synchronizeLinks = in.readBoolean();
+		reset = in.readBoolean();
 		allow_multi_task = in.readBoolean();
 		condition = in.readUTF();
-		filter = in.readUTF();
+		String filterJson = in.readUTF();
+		if (!filterJson.equals("{}")) {
+			filter = JSON.parseObject(filterJson, FilterConfig.class);
+		}
 		encoding = in.readUTF();
 		download_root = in.readUTF();
 		String queueJson = in.readUTF();
