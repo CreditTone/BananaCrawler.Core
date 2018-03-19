@@ -159,6 +159,19 @@ public class ExpandHandlebars extends Handlebars {
 			}
 
 		});
+		registerHelper("substr", new Helper<Object>() {
+
+			public Object apply(Object context, Options options) throws IOException {
+				String content = options.param(0);
+				int start = options.param(1);
+				int end = options.param(2);
+				if (start >= 0 && content.length() >= end) {
+					return content.substring(start, end);
+				}
+				return content;
+			}
+
+		});
 		registerHelper("or", new Helper<Object>() {
 
 			@Override

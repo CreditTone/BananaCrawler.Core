@@ -70,7 +70,7 @@ public class DefaultHttpDownloader implements HttpDownloader {
 	
 	private BasicHttpContext getHttpContext() {
 		BasicHttpContext defaultContext = new BasicHttpContext();
-		Builder build = RequestConfig.custom().setSocketTimeout(timeout * 1000).setConnectTimeout(timeout * 1000)
+		Builder build = RequestConfig.custom().setSocketTimeout(timeout * 1000 * 3).setConnectTimeout(timeout * 1000)
 				.setConnectionRequestTimeout(timeout * 1000).setRedirectsEnabled(true).setCircularRedirectsAllowed(true);
 		if (httpsProxy != null) {
 			HttpHost proxy = new HttpHost(httpsProxy.getServer(),httpsProxy.getPort());
@@ -114,10 +114,6 @@ public class DefaultHttpDownloader implements HttpDownloader {
             page.setOwnerUrl(getOwnerUrl(httpContext));
             page.setRedirected(!method.getURI().toString().equals(page.getOwnerUrl()));
 		} catch (Exception e) {
-			page = new Page();
-			page.setStatus(500);
-			page.setRequest(request);
-			page.setDriverId(String.valueOf(client.hashCode()));
 			log.warn("download error " + request.getUrl(), e);
 		} finally {
 			if (method != null) {

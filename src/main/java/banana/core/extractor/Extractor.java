@@ -59,6 +59,23 @@ public class Extractor {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		String url = "http://hymart.cn/dianpu/dianpus/4-[800-4000].shtml";
+		Matcher matcher = Pattern.compile("\\[(\\d+)\\-(\\d+)\\]").matcher(url);
+		if (matcher.find()) {
+			List<String> genarateUrls = new ArrayList<String>();
+			String oldStr = matcher.group();
+			int startNumber = Integer.parseInt(matcher.group(1));
+			int endNumber = Integer.parseInt(matcher.group(2));
+			for (int i = startNumber; i < endNumber; i++) {
+				genarateUrls.add(url.replace(oldStr, String.valueOf(i)));
+			}
+			String[] urls  = new String[genarateUrls.size()];
+			genarateUrls.toArray(urls);
+			System.out.println(urls[2]);
+		}
+		if (true) {
+			return;
+		}
 		//String url = "https://shopsearch.taobao.com/search?app=shopsearch&q=%E5%94%AF%E6%9F%94%E6%97%97%E8%88%B0%E5%BA%97&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20180309&ie=utf8";
 		//Document doc = Jsoup.connect(url).get();
 		//System.out.println(doc);

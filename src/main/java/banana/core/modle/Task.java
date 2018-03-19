@@ -56,8 +56,6 @@ public final class Task implements Writable, Cloneable {
 
 		public String[] downloads;
 
-		public Map<String, Object> url_iterator;
-
 		public String method;
 
 		public Map<String, String> headers;

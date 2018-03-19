@@ -1,8 +1,15 @@
 package banana.core.download.pool;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 
+import javax.net.ssl.SSLException;
+
+import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
@@ -16,6 +23,7 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
 
 import banana.core.download.impl.HttpCookieSpecProvider;
@@ -111,9 +119,26 @@ public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClien
 		RequestConfig requestConfig = configBuilder.build();
 		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig)
 				.setDefaultCookieStore(cookieStore)
+				.setRetryHandler(new MyHttpRequestRetryHandler())
 				.setDefaultCookieSpecRegistry(registry)
 				.setConnectionManager(cm).build();
 		return httpClient;
+	}
+	
+	public static class MyHttpRequestRetryHandler implements HttpRequestRetryHandler{
+
+		@Override
+		public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+			if (executionCount >= 3) {
+	            // Do not retry if over max retry count
+	            return false;
+	        }
+	        if (exception instanceof java.net.SocketTimeoutException) {
+	            // Connection refused
+	            return true;
+	        }
+			return false;
+		}
 	}
 	
 }
