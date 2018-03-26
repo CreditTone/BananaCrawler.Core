@@ -27,6 +27,18 @@ public class ExpandHandlebars extends Handlebars {
 	private static Logger logger = Logger.getLogger(ExpandHandlebars.class);
 
 	public ExpandHandlebars() {
+		registerHelper("randomChar", new Helper<Object>() {
+
+			public Object apply(Object context, Options options) throws IOException {
+				int number = Integer.parseInt(options.param(0).toString());
+				StringBuilder sb = new StringBuilder();
+				for(int i = 0; i < number ; i++) {
+					char c = (char) (0x4e00 + (int) (Math.random() * (0x9fa5 - 0x4e00 + 1)));
+					sb.append(c);
+				}
+				return sb.toString();
+			}
+		});
 		registerHelper("add", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
