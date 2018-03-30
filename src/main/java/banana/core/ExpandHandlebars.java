@@ -32,8 +32,15 @@ public class ExpandHandlebars extends Handlebars {
 			public Object apply(Object context, Options options) throws IOException {
 				int number = Integer.parseInt(options.param(0).toString());
 				StringBuilder sb = new StringBuilder();
+				String chars = "abcdefghijklmnopqrstuvwxyz";
+				int r = (int) (Math.random() * 100 % 2);
 				for(int i = 0; i < number ; i++) {
-					char c = (char) (0x4e00 + (int) (Math.random() * (0x9fa5 - 0x4e00 + 1)));
+					char c = 'A';
+					if (r == 0) {
+						c = (char) (0x4e00 + (int) (Math.random() * (0x9fa5 - 0x4e00 + 1)));
+					}else {
+						c = chars.charAt((int)(Math.random() * 26));
+					}
 					sb.append(c);
 				}
 				return sb.toString();
