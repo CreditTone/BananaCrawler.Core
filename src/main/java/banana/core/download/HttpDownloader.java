@@ -27,6 +27,4 @@ public interface HttpDownloader extends Closeable{
     public void injectCookies(Cookies cookies);
     
     public Cookies getCookies();
-    
-    public void blockDriver(String driverId);
 }

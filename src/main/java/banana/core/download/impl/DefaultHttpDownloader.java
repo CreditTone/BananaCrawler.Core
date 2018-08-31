@@ -2,10 +2,9 @@ package banana.core.download.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +25,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHttpRequest;
@@ -54,18 +54,30 @@ public class DefaultHttpDownloader implements HttpDownloader {
 
 	private int timeout = 15;
 
-	private volatile HttpClientPool httpClientPool;
-	
-	protected Set<String> blockedDrivers = Collections.synchronizedSet(new HashSet<String>());
-	
 	private HttpsProxy httpsProxy;
+	
+	private CloseableHttpClient httpClient;
+	
+	private BasicCookieStore cookieStore;
 	
 	public DefaultHttpDownloader() {
 		this(null);
 	}
 
 	public DefaultHttpDownloader(Cookies initCookies) {
-		httpClientPool = new HttpClientPool(initCookies);
+		cookieStore = new BasicCookieStore();
+		if (initCookies != null) {
+			Iterator<Cookie> iter = initCookies.iterator();
+			while(iter.hasNext()){
+				Cookie cookie = iter.next();
+				cookieStore.addCookie(cookie.convertHttpClientCookie());
+			}
+		}
+		try {
+			httpClient = HttpClientPool.createHttpClient(cookieStore);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private BasicHttpContext getHttpContext() {
@@ -77,7 +89,7 @@ public class DefaultHttpDownloader implements HttpDownloader {
 			build.setProxy(proxy);
 			if (httpsProxy.getUsername() != null && httpsProxy.getPassword() != null) {
 				CredentialsProvider credsProvider = new BasicCredentialsProvider(); //
-				  credsProvider.setCredentials(  new AuthScope(httpsProxy.getServer(),httpsProxy.getPort()),
+				  credsProvider.setCredentials(new AuthScope(httpsProxy.getServer(), httpsProxy.getPort()),
 				  new UsernamePasswordCredentials(httpsProxy.getUsername(), httpsProxy.getPassword()));
 				  defaultContext.setAttribute(HttpClientContext.CREDS_PROVIDER, credsProvider);
 			}
@@ -88,29 +100,18 @@ public class DefaultHttpDownloader implements HttpDownloader {
 
 	@Override
 	public void close() throws IOException {
-		if (httpClientPool != null) {
-			httpClientPool.closeAll();
-		}
 	}
 
 	@Override
 	public Page download(PageRequest request) {
 		Page page = null;
-		CloseableHttpClient client = null;
 		HttpRequestBase method = null;
 		try {
-			client = httpClientPool.get();
-			while (blockedDrivers.contains(String.valueOf(client.hashCode()))) {
-				httpClientPool.returnToPool(client);
-				Thread.sleep(1000);
-				log.warn("driver blocked " + String.valueOf(client.hashCode()));
-				client = httpClientPool.get();
-			}
 			method = buildHttpUriRequest(request);
 			HttpContext httpContext = getHttpContext();
-			HttpResponse response = client.execute(method, httpContext);
+			HttpResponse response = httpClient.execute(method, httpContext);
 			page = new Page(request, response);
-			page.setDriverId(String.valueOf(client.hashCode()));
+			page.setDriverId(String.valueOf(httpClient.hashCode()));
             page.setOwnerUrl(getOwnerUrl(httpContext));
             page.setRedirected(!method.getURI().toString().equals(page.getOwnerUrl()));
 		} catch (Exception e) {
@@ -120,27 +121,18 @@ public class DefaultHttpDownloader implements HttpDownloader {
 				method.abort();
 				method.releaseConnection();
 			}
-			httpClientPool.returnToPool(client);
 		}
 		return page;
 	}
 	
 	@Override
 	public StreamResponse downloadBinary(BinaryRequest request) {
-		CloseableHttpClient client = null;
 		HttpRequestBase method = null;
 		StreamResponse stream = null;
 		try {
-			client = httpClientPool.get();
-			while (blockedDrivers.contains(String.valueOf(client.hashCode()))) {
-				httpClientPool.returnToPool(client);
-				Thread.sleep(1000);
-				log.warn("driver blocked " + String.valueOf(client.hashCode()));
-				client = httpClientPool.get();
-			}
 			method = buildHttpUriRequest(request);
 			HttpContext context = getHttpContext();
-			HttpResponse response = client.execute(method, context);
+			HttpResponse response = httpClient.execute(method, context);
 			stream = new StreamResponse(request, response);
 			stream.setOwnerUrl(getOwnerUrl(context));
 			stream.setRedirected(!method.getURI().toString().equals(stream.getOwnerUrl()));
@@ -151,7 +143,6 @@ public class DefaultHttpDownloader implements HttpDownloader {
 				method.abort();
 				method.releaseConnection();
 			}
-			httpClientPool.returnToPool(client);
 		}
 		return stream;
 	}
@@ -162,17 +153,9 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		return targetHost.toString();
 	}
 	
-	public void setMaxDriverCount(int drivercount) {
-		httpClientPool.setMaxDriverCount(drivercount);
-	}
-
-	public void setMinDriverCount(int drivercount) {
-		httpClientPool.setMinDriverCount(drivercount);
-	}
 
 	@Override
 	public void open() {
-		httpClientPool.open();
 	}
 
 	/**
@@ -243,22 +226,16 @@ public class DefaultHttpDownloader implements HttpDownloader {
 
 	@Override
 	public void injectCookies(Cookies cookies) {
-		Iterator<CloseableHttpClient> drivers = httpClientPool.drivers();
-		httpClientPool.setCookies(cookies);
-		while (drivers.hasNext()) {
-			CloseableHttpClient client = drivers.next();
-			blockedDrivers.remove(String.valueOf(client.hashCode()));
+		Iterator<Cookie> iter = cookies.iterator();
+		while(iter.hasNext()){
+			Cookie cookie = iter.next();
+			cookieStore.addCookie(cookie.convertHttpClientCookie());
 		}
 	}
 
 	@Override
-	public void blockDriver(String driverId) {
-		blockedDrivers.add(driverId);
-	}
-
-	@Override
 	public Cookies getCookies() {
-		List<org.apache.http.cookie.Cookie> cookies = this.httpClientPool.getCookieStore().getCookies();
+		List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
 		Cookies cookies2 = new Cookies();
 		for (org.apache.http.cookie.Cookie cookie : cookies) {
 			cookies2.addCookie(new Cookie(cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(),

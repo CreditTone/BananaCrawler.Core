@@ -1,14 +1,9 @@
 package banana.core.download.pool;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 
-import javax.net.ssl.SSLException;
-
-import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -33,10 +28,7 @@ import banana.core.request.Cookies;
 
 public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClient>{
 	
-
-	private BasicCookieStore cookieStore = new BasicCookieStore();
-	
-	private Registry<CookieSpecProvider> registry = RegistryBuilder.<CookieSpecProvider> create()
+	private static Registry<CookieSpecProvider> registry = RegistryBuilder.<CookieSpecProvider> create()
 			.register(CookieSpecs.DEFAULT, new HttpCookieSpecProvider())
 			.register(CookieSpecs.BROWSER_COMPATIBILITY, new HttpCookieSpecProvider())
 			.register(CookieSpecs.NETSCAPE, new HttpCookieSpecProvider())
@@ -47,9 +39,6 @@ public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClien
 			.build();
 
     public HttpClientPool(Cookies initCookie) {
-		if (initCookie != null){
-			setCookies(initCookie);
-		}
     }
 
     /**
@@ -57,11 +46,11 @@ public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClien
      */
 	public final CloseableHttpClient createDriver(){
 		CloseableHttpClient poll = null;
-		try {
-			poll = createHttpClient(cookieStore);
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			poll = createHttpClient(cookieStore);
+//		} catch (NoSuchAlgorithmException e) {
+//			e.printStackTrace();
+//		}
 		return poll;
 	}
 
@@ -80,20 +69,17 @@ public final class HttpClientPool extends DriverPoolInterface<CloseableHttpClien
     public final void setPageLoadTimeout(int timeout){
     }
 
-	public BasicCookieStore getCookieStore() {
-		return cookieStore;
-	}
 	
-	public void setCookies(Cookies cookies) {
-		cookieStore.clear();
-		Iterator<Cookie> iter = cookies.iterator();
-		while(iter.hasNext()){
-			Cookie cookie = iter.next();
-			cookieStore.addCookie(cookie.convertHttpClientCookie());
-		}
-	}
+//	public void setCookies(Cookies cookies) {
+//		cookieStore.clear();
+//		Iterator<Cookie> iter = cookies.iterator();
+//		while(iter.hasNext()){
+//			Cookie cookie = iter.next();
+//			cookieStore.addCookie(cookie.convertHttpClientCookie());
+//		}
+//	}
 	
-	private CloseableHttpClient createHttpClient(BasicCookieStore cookieStore) throws NoSuchAlgorithmException {
+	public static CloseableHttpClient createHttpClient(BasicCookieStore cookieStore) throws NoSuchAlgorithmException {
 		PoolingHttpClientConnectionManager cm = null;
 		SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
 		try {

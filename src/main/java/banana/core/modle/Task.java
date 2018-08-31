@@ -95,14 +95,6 @@ public final class Task implements Writable, Cloneable {
 
 	public static class PageProcessorConfig {
 
-		public static final class BlockCondition {
-
-			public String condition;
-
-			public String email;
-
-		}
-		
 		public static final class Forwarder {
 
 			public String condition;
@@ -113,27 +105,18 @@ public final class Task implements Writable, Cloneable {
 
 		public String index;
 		
-		public static class ContentPrepare {
-			public String _option;
-			public String _expression;
-		}
-		
 		public static class RetryCondition {
 			public List<String> or;
 			public List<String> and;
 			public int maxRetry;
 		}
-
-		public ContentPrepare content_prepare;
-
+		
 		public HashMap<String, Object> page_context;
 
 		public HashMap<String, Object> task_context;
 		
 		public HashMap<String, Object> global_context;
 
-		public List<BlockCondition> blockConditions;
-		
 		public RetryCondition retry_condition;
 		
 		public HashMap<String, Object>[] crawler_request;
@@ -141,6 +124,8 @@ public final class Task implements Writable, Cloneable {
 		public HashMap<String, Object>[] crawler_data;
 
 		public Forwarder[] forwarders;
+		
+		public String[] actions;
 
 		public String[] logs;
 	}
@@ -169,11 +154,11 @@ public final class Task implements Writable, Cloneable {
 		} else if (collection.contains("&")) {
 			throw new IllegalArgumentException("collection cannot contain underscore symbols");
 		}
-		if (!Arrays.asList("default", "phantomjs", "htmlunit").contains(downloader)) {
-			throw new IllegalArgumentException("downloader " + downloader + " doesn't support");
-		}
 		if (processors == null || processors.isEmpty()) {
 			throw new Exception("There is no processors");
+		}
+		if (downloader.startsWith("firefox")) {
+			thread = 1;
 		}
 		Set<String> indexs = new HashSet<String>();
 		for (PageProcessorConfig processor : processors) {

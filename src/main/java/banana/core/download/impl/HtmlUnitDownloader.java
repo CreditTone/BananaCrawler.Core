@@ -28,12 +28,6 @@ public class HtmlUnitDownloader extends DefaultHttpDownloader {
 		HtmlUnitDriver driver = null;
 		try {
 			driver = driverPool.get();
-			while(blockedDrivers.contains(String.valueOf(driver.hashCode()))){
-				driverPool.returnToPool(driver);
-				Thread.sleep(1000);
-				logger.warn("driver blocked " + String.valueOf(driver.hashCode()));
-				driver = driverPool.get();
-			}
 			driver.get(request.getEncodeUrl());
 			page = new Page();
 			if (driver.getPageSource().startsWith("<html><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">")){
@@ -83,7 +77,6 @@ public class HtmlUnitDownloader extends DefaultHttpDownloader {
 				Cookie cookie = cookieIter.next();
 				driver.manage().addCookie(cookie.convertSeleniumCookie());
 			}
-			blockedDrivers.remove(String.valueOf(driver.hashCode()));
 		}
 	}
 }

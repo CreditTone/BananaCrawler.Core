@@ -14,5 +14,4 @@ public class DownloaderConfig {
 
 	public Master master;
 	
-	public String phantomjs;
 }

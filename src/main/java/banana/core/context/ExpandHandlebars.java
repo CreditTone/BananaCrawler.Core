@@ -1,4 +1,4 @@
-package banana.core;
+package banana.core.context;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -81,38 +81,11 @@ public class ExpandHandlebars extends Handlebars {
 				return product;
 			}
 		});
-		registerHelper("gt", new Helper<Object>() {
-
-			public Object apply(Object context, Options options) throws IOException {
-				try {
-					float p0 = Float.parseFloat(((Object) options.param(0)).toString());
-					if (options.param(1) == null) {
-						return false;
-					}
-					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
-					return p0 > p1;
-				} catch (Exception e) {
-					logger.warn(options.context.model() + e.getMessage() + ",好像有东西没解析到哦");
-				}
-				return false;
-			}
-		});
-		registerHelper("lt", new Helper<Object>() {
-
-			public Object apply(Object context, Options options) throws IOException {
-				try {
-					float p0 = Float.parseFloat(((Object) options.param(0)).toString());
-					if (options.param(1) == null) {
-						return false;
-					}
-					float p1 = Float.parseFloat(((Object) options.param(1)).toString());
-					return p0 < p1;
-				} catch (Exception e) {
-					logger.warn(options.context.model() + e.getMessage() + ",好像有东西没解析到哦");
-				}
-				return false;
-			}
-		});
+		StaticMethod.registerGt(this);
+		StaticMethod.registerLt(this);
+		StaticMethod.registerHasPrefix(this);
+		StaticMethod.registerHasSuffix(this);
+		
 		registerHelper("eq", new Helper<Object>() {
 
 			public Object apply(Object context, Options options) throws IOException {
@@ -267,9 +240,63 @@ public class ExpandHandlebars extends Handlebars {
 	}
 
 	public Template compileEscapeInline(String input) throws IOException {
-		return new EscapeTemplate(super.compileInline(input));
+		//语法兼容golang templdate
+		String javaTemplate = golangTemplate(input);
+		return new EscapeTemplate(super.compileInline(javaTemplate));
 	}
-
+	public String golangTemplate(String input) {
+		List<String> segments = new ArrayList<String>();
+		StringBuilder segment = new StringBuilder();
+		for (int i = 0 ;i < input.length() ; i++) {
+			if (input.charAt(i) == '{' && input.charAt(i+1) == '{') {
+				if (segment.length() > 0) {
+					segments.add(segment.toString());
+				}
+				segment = new StringBuilder();
+			}else if (input.charAt(i) == '}' && input.charAt(i-1) == '}') {
+				if (segment.length() > 0) {
+					segment.append(input.charAt(i));
+					segments.add(segment.toString());
+				}
+				segment = new StringBuilder();
+				continue;
+			}
+			segment.append(input.charAt(i));
+		}
+		for (int x = 0; x < segments.size() ; x++) {
+			String segment2 = segments.get(x);
+			if (segment2.startsWith("{{") && segment2.endsWith("}}")) {
+				StringBuilder item = new StringBuilder()  ;
+				boolean isField = segment2.substring(2, segment2.length()-2).trim().startsWith(".");//标记是方法还是字段
+				boolean isPassedFuncName = false;
+				for (int i = 0 ;i < segment2.length() ; i++) {
+					if (segment2.charAt(i) == '.' && (segment2.charAt(i-1) == ' ' || segment2.charAt(i-1) == '\t' || segment2.charAt(i-1) == '{')) {
+						continue;
+					}
+					if (!isField && !isPassedFuncName && (segment2.charAt(i) == ' ' || segment2.charAt(i) == '\t')) {
+						isPassedFuncName = true;
+						item.append(" n ");
+						continue;
+					}
+					if (segment2.charAt(i) == '\'') {
+						item.append("\"");
+					}else {
+						item.append(segment2.charAt(i));
+					}
+					
+				}
+				segments.set(x, item.toString());
+			}else {
+				continue;
+			}
+		}
+		StringBuilder result = new StringBuilder();
+		for (String segment3 : segments) {
+			result.append(segment3);
+		}
+		return result.toString();
+	}
+	
 	public String escapeParse(String input, Map<String, Object> context) throws IOException {
 		Template template = compileEscapeInline(input);
 		return template.apply(context);
