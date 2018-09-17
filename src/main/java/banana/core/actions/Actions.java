@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -18,8 +17,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Options;
 
+import banana.core.extractor2.html.Util;
 import banana.core.modle.ContextModle;
-import banana.core.request.HttpRequest;
+import banana.core.response.HttpResponse;
+import banana.core.response.Page;
 
 public class Actions {
 
@@ -28,12 +29,13 @@ public class Actions {
 	private RemoteWebDriver webdriver;
 
 	private ContextModle context;
+	
+	private HttpResponse response;
 
-	private boolean interrupt;
-
-	public Actions(RemoteWebDriver webdriver,ContextModle context) {
+	public Actions(RemoteWebDriver webdriver,HttpResponse response,ContextModle context) {
 		this.webdriver = webdriver;
 		this.context = context;
+		this.response = response;
 		init();
 	}
 
@@ -42,8 +44,10 @@ public class Actions {
 			@Override
 			public Object apply(Object context, Options options) throws IOException {
 				String cssSelector = options.param(0);
+				cssSelector = Util.jqueryCompatibility(cssSelector);
 				String output = options.param(1);
-				selenium_captureElement(cssSelector, output);
+				String statuskey = options.params.length > 2 ? options.param(options.params.length - 1) : null;
+				selenium_captureElement(cssSelector, output, statuskey);
 				return null;
 			}
 		});
@@ -51,8 +55,10 @@ public class Actions {
 			@Override
 			public Object apply(Object context, Options options) throws IOException {
 				String cssSelector = options.param(0);
+				cssSelector = Util.jqueryCompatibility(cssSelector);
 				String keys = options.param(1);
-				selenium_sendKeys(cssSelector, keys);
+				String statuskey = options.params.length > 2 ? options.param(options.params.length - 1) : null;
+				selenium_sendKeys(cssSelector, keys, statuskey);
 				return null;
 			}
 		});
@@ -60,7 +66,19 @@ public class Actions {
 			@Override
 			public Object apply(Object context, Options options) throws IOException {
 				String cssSelector = options.param(0);
-				selenium_click(cssSelector);
+				cssSelector = Util.jqueryCompatibility(cssSelector);
+				String statuskey = options.params.length > 1 ? options.param(options.params.length - 1) : null;
+				selenium_click(cssSelector, statuskey);
+				return null;
+			}
+		});
+		context.registerHelper("selenium_jsclick", new Helper<Object>() {
+			@Override
+			public Object apply(Object context, Options options) throws IOException {
+				String cssSelector = options.param(0);
+				cssSelector = Util.jqueryCompatibility(cssSelector);
+				String statuskey = options.params.length > 1 ? options.param(options.params.length - 1) : null;
+				selenium_jsclick(cssSelector, statuskey);
 				return null;
 			}
 		});
@@ -78,9 +96,7 @@ public class Actions {
 
 	public void start(String[] actions) throws IOException {
 		for (int i = 0; i < actions.length; i++) {
-			if (!interrupt) {
-				context.parseString(actions[i]);
-			}
+			context.parseString(actions[i]);
 		}
 	}
 	
@@ -93,51 +109,101 @@ public class Actions {
 		logger.info("ocrDecode result:"+result);
 	}
 	
-	public void selenium_click(String cssSelector) {
+	public void selenium_click(String cssSelector, String statuskey) {
 		try {
 			WebElement element = webdriver.findElementByCssSelector(cssSelector);
 			if (element == null) {
 				logger.info("没有找到元素"+cssSelector);
-				interrupt = true;
 				return;
 			}
+			if (!element.isEnabled()) {
+				logger.info("元素点击");
+			}
+//			org.openqa.selenium.interactions.Actions seleniumAction = new org.openqa.selenium.interactions.Actions(webdriver);
+//			seleniumAction.moveToElement(element).build().perform();
+//			webdriver.executeScript("arguments[0].scrollTop=100;", element);
+			Thread.sleep(2000);
 			element.click();
+			context.put("_owner_url", webdriver.getCurrentUrl());
+			context.put("_content", webdriver.getPageSource());
+			response.setOwnerUrl((String) context.get("_owner_url"));
+			((Page)response).setContent((String) context.get("_content"));
 			Thread.sleep(5000);
+			if (statuskey != null) {
+				context.put(statuskey, true);
+			}
 		} catch (Exception e) {
-			interrupt = true;
+			logger.warn("点击失败 " + e.getMessage());
+			if (statuskey != null) {
+				context.put(statuskey, false);
+			}
 		}
 	}
 	
-	public void selenium_sendKeys(String cssSelector,String keys) {
+	
+	public void selenium_jsclick(String cssSelector, String statuskey) {
+		try {
+			webdriver.executeScript("document.querySelector(arguments[0]).click()", cssSelector);
+			Thread.sleep(2000);
+			context.put("_owner_url", webdriver.getCurrentUrl());
+			context.put("_content", webdriver.getPageSource());
+			response.setOwnerUrl((String) context.get("_owner_url"));
+			((Page)response).setContent((String) context.get("_content"));
+			Thread.sleep(5000);
+			if (statuskey != null) {
+				context.put(statuskey, true);
+			}
+		} catch (Exception e) {
+			logger.warn("点击失败 " + e.getMessage());
+			if (statuskey != null) {
+				context.put(statuskey, false);
+			}
+		}
+	}
+	
+	public void selenium_sendKeys(String cssSelector,String keys,String statuskey) {
 		try {
 			WebElement element = webdriver.findElementByCssSelector(cssSelector);
 			if (element == null) {
 				logger.info("没有找到元素"+cssSelector);
-				interrupt = true;
 				return;
+			}
+			if (!element.isEnabled()) {
+				logger.info("元素不能编辑");
 			}
 			element.clear();
 			element.sendKeys(keys);
 			Thread.sleep(5000);
+			if (statuskey != null) {
+				context.put(statuskey, true);
+			}
 		} catch (Exception e) {
-			interrupt = true;
+			logger.warn("设置文字失败" + e.getMessage());
+			if (statuskey != null) {
+				context.put(statuskey, false);
+			}
 		}
 	}
 
-	public void selenium_captureElement(String cssSelector, String output) {
+	public void selenium_captureElement(String cssSelector, String output, String statuskey) {
 		try {
 			WebElement element = webdriver.findElementByCssSelector(cssSelector);
 			if (element == null) {
 				logger.info("没有找到元素"+cssSelector);
-				interrupt = true;
 				return;
 			}
 			byte[] body = selenium_ElementToBytes(element);
 			if (body != null) {
 				context.put(output, body);
 			}
+			if (statuskey != null) {
+				context.put(statuskey, true);
+			}
 		} catch (Exception e) {
-			interrupt = true;
+			logger.warn("截图失败" + e.getMessage());
+			if (statuskey != null) {
+				context.put(statuskey, false);
+			}
 		}
 	}
 
@@ -167,6 +233,22 @@ public class Actions {
 			}
 		}
 		return null;
+	}
+
+	public static Logger getLogger() {
+		return logger;
+	}
+
+	public RemoteWebDriver getWebdriver() {
+		return webdriver;
+	}
+
+	public ContextModle getContext() {
+		return context;
+	}
+
+	public HttpResponse getResponse() {
+		return response;
 	}
 
 }

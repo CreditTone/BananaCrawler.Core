@@ -47,8 +47,11 @@ public class JsonExtractor {
 		return null;
 	}
 	
-	public static List<Object> doJsonExtractor(String array_define,String val) throws Exception{
+	public static List<Object> doJsonExtractor(String array_define,String val) throws Exception {
 		Object obj = catchExReadJson(val, array_define);
+		if (obj == null) {
+			return null;
+		}
 		List<Object> result = new ArrayList<Object>();
 		JSONArray array = JSON.parseArray(obj.toString());
 		for (int x = 0 ; x<array.size(); x++) {

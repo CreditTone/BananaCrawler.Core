@@ -27,60 +27,11 @@ public class ExpandHandlebars extends Handlebars {
 	private static Logger logger = Logger.getLogger(ExpandHandlebars.class);
 
 	public ExpandHandlebars() {
-		registerHelper("randomChar", new Helper<Object>() {
-
-			public Object apply(Object context, Options options) throws IOException {
-				int number = Integer.parseInt(options.param(0).toString());
-				StringBuilder sb = new StringBuilder();
-				String chars = "abcdefghijklmnopqrstuvwxyz";
-				int r = (int) (Math.random() * 100 % 2);
-				for(int i = 0; i < number ; i++) {
-					char c = 'A';
-					if (r == 0) {
-						c = (char) (0x4e00 + (int) (Math.random() * (0x9fa5 - 0x4e00 + 1)));
-					}else {
-						c = chars.charAt((int)(Math.random() * 26));
-					}
-					sb.append(c);
-				}
-				return sb.toString();
-			}
-		});
-		registerHelper("add", new Helper<Object>() {
-
-			public Object apply(Object context, Options options) throws IOException {
-				int sum = 0;
-				int p0 = 0;
-				for (int i = 0; i < options.params.length; i++) {
-					p0 = Integer.parseInt(options.param(i).toString());
-					sum += p0;
-				}
-				return sum;
-			}
-		});
-		registerHelper("sub", new Helper<Object>() {
-
-			public Object apply(Object context, Options options) throws IOException {
-				int p0 = options.param(0);
-				for (int i = 1; i < options.params.length; i++) {
-					int p = Integer.parseInt(options.param(i).toString());
-					p0 -= p;
-				}
-				return p0;
-			}
-		});
-		registerHelper("multiply", new Helper<Object>() {
-
-			public Object apply(Object context, Options options) throws IOException {
-				int product = Integer.parseInt(options.param(0).toString());
-				int p0;
-				for (int i = 1; i < options.params.length; i++) {
-					p0 = Integer.parseInt(options.param(i).toString());
-					product *= p0;
-				}
-				return product;
-			}
-		});
+		StaticMethod.registerRandomChar(this);
+		StaticMethod.registerSum(this);
+		StaticMethod.registerSubtract(this);
+		StaticMethod.registerMultiply(this);
+		StaticMethod.registerDivide(this);
 		StaticMethod.registerGt(this);
 		StaticMethod.registerLt(this);
 		StaticMethod.registerHasPrefix(this);
@@ -242,9 +193,11 @@ public class ExpandHandlebars extends Handlebars {
 	public Template compileEscapeInline(String input) throws IOException {
 		//语法兼容golang templdate
 		String javaTemplate = golangTemplate(input);
+		System.out.println(javaTemplate);
 		return new EscapeTemplate(super.compileInline(javaTemplate));
 	}
-	public String golangTemplate(String input) {
+	
+	public static String golangTemplate(String input) {
 		List<String> segments = new ArrayList<String>();
 		StringBuilder segment = new StringBuilder();
 		for (int i = 0 ;i < input.length() ; i++) {
@@ -262,6 +215,9 @@ public class ExpandHandlebars extends Handlebars {
 				continue;
 			}
 			segment.append(input.charAt(i));
+		}
+		if (segment.length() > 0) {
+			segments.add(segment.toString());
 		}
 		for (int x = 0; x < segments.size() ; x++) {
 			String segment2 = segments.get(x);
@@ -295,6 +251,10 @@ public class ExpandHandlebars extends Handlebars {
 			result.append(segment3);
 		}
 		return result.toString();
+	}
+	
+	public static void main(String[] args) throws IOException {
+		System.out.println(golangTemplate("{{selenium_click 'a[class='right-arrow iconfont icon-btn_right']'}}"));
 	}
 	
 	public String escapeParse(String input, Map<String, Object> context) throws IOException {

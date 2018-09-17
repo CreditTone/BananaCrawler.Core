@@ -17,14 +17,14 @@ public class HtmlExtractor {
 	public static List<Object> doHtmlExtractor(String array_define,String val) throws Exception {
 		Document doc = Jsoup.parse(val);
 		Elements elements = doXpath(array_define , new Elements(doc)) ;
-		if (elements != null) {
-			List<Object> result = new ArrayList<Object>();
-			for (Element element : elements) {
-				result.add(element.html());
-			}
-			return result;
+		if (elements == null || elements.isEmpty()) {
+			return null;
 		}
-		return null;
+		List<Object> result = new ArrayList<Object>();
+		for (Element element : elements) {
+			result.add(element.html());
+		}
+		return result;
 	}
 	
 	//解析单个结果
@@ -48,6 +48,9 @@ public class HtmlExtractor {
 		}
 		if (selector.getAttr() != null) {
 			text = b.attr(selector.getAttr());
+			if (text != null && text.trim().isEmpty()) {
+				text = null;
+			}
 		}
 		return text;
 	}

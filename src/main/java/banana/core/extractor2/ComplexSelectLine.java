@@ -46,12 +46,8 @@ public class ComplexSelectLine {
 		}
 	}
 	
-	private String bukuohao(String input) {
-		return null;
-	}
-	
 	public static void main(String[] args) {
-		new ComplexSelectLine("html(#root div:contains('授权码已过期')) json(dsa.das.das21)");
+		new ComplexSelectLine("string(,([^,]+)) json(center)");
 	}
 
 	public List<SelectItem> getSelectItems() {

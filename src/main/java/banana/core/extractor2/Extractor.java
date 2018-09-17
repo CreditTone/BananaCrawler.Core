@@ -10,6 +10,7 @@ import banana.core.modle.ContextModle;
 
 public class Extractor {
 	
+	
 	public static final String ARRAY_DEFINE  = "_array";
 	public static final String FIRST_DEFINE = "_first";
 
@@ -31,7 +32,7 @@ public class Extractor {
 			}
 			if (array_define != null) {
 				List<Object> array_ret = doParseArray(array_define, body, contextModle);
-				if (isEmptyParse(parseConfig)) {
+				if (array_ret == null || isEmptyParse(parseConfig)) {
 					return array_ret;
 				}
 				List<Object> arrayRet = new ArrayList<>();
@@ -107,7 +108,6 @@ public class Extractor {
 		return complexSelectLineObj.doComplexSelectLineFirst(body);
 	}
 	
-	
 	private static Object doParseFinalResult(String complexParseLine,String body,ContextModle contextModle) throws Exception {
 		if (complexParseLine.startsWith("{{") && complexParseLine.endsWith("}}")) {
 			return contextModle.parseObject(complexParseLine);
@@ -121,4 +121,5 @@ public class Extractor {
 		ComplexSelectLine complexSelectLineObj = new ComplexSelectLine(complexParseLine);
 		return complexSelectLineObj.doComplexSelectLine(body);
 	}
+	
 }

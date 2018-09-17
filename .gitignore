@@ -7,3 +7,5 @@ log/
 doc/
 project/
 *DS_Store
+libs/
+logs/

@@ -1,32 +1,12 @@
 package banana.core.download.impl;
 
-import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.internal.WrapsDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -35,30 +15,19 @@ import banana.core.request.Cookies;
 import banana.core.request.PageRequest;
 import banana.core.response.Page;
 
-public class FirefoxDownloader extends DefaultHttpDownloader {
+public class ChromeDownloader extends DefaultHttpDownloader {
 	
-	private final Logger logger = Logger.getLogger(FirefoxDownloader.class);
+	private final Logger logger = Logger.getLogger(ChromeDownloader.class);
 	
 	private RemoteWebDriver webDriver;
 	
-	public FirefoxDownloader(String service,Cookies cookies) {
-		DesiredCapabilities desiredCapabilities = DesiredCapabilities.firefox();
+	public ChromeDownloader(String service,Cookies cookies) {
+		DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
 		Map<String,Object> timeouts = new HashMap<String,Object>();
 		timeouts.put("implicit", 5000);
 		timeouts.put("pageLoad", 15000);
 		timeouts.put("script", 10000);
-		desiredCapabilities.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-		desiredCapabilities.setCapability("ignoreProtectedModeSettings", true);
 		desiredCapabilities.setCapability("timeouts", timeouts);
-		//desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
-		Map<String,Object> that = new HashMap<String,Object>();
-		Map<String, Object> prefs = new HashMap<String,Object>();
-		//禁用css
-		//prefs.put("permissions.default.stylesheet", 2);
-		//禁用flash
-		prefs.put("dom.ipc.plugins.enabled.libflashplayer.so", false);
-		that.put("prefs", prefs);
-		desiredCapabilities.setCapability("moz:firefoxOptions", that);
 		System.out.println("初始化中....");
 		try {
 			webDriver = new RemoteWebDriver(new URL(service),desiredCapabilities) {
@@ -66,6 +35,8 @@ public class FirefoxDownloader extends DefaultHttpDownloader {
 				public void get(String url) {
 					try {
 						super.get(url);
+					}catch(UnhandledAlertException e) {
+						logger.warn("UnhandledAlertException请忽略", e);
 					}catch(Exception e) {
 						String message = e.getMessage().toLowerCase();
 						if (!message.contains("timeout")) {
@@ -90,9 +61,11 @@ public class FirefoxDownloader extends DefaultHttpDownloader {
 		}
 	}
 	
-	public static void main(String[] args) {
-		FirefoxDownloader downloader = new FirefoxDownloader("http://10.2.11.176:4444/wd/hub", null);
+	public static void main(String[] args) throws InterruptedException {
+		ChromeDownloader downloader = new ChromeDownloader("http://10.2.60.178:4444/wd/hub", null);
+		Thread.sleep(10 * 1000);
 		downloader.webDriver.get("http://wf.meituan.com");
+		Thread.sleep(60 * 1000);
 	}
 	
 	@Override
@@ -112,7 +85,7 @@ public class FirefoxDownloader extends DefaultHttpDownloader {
 			page.setRequest(request);
 			page.setDriverId(webDriver.getSessionId().toString());
 			Thread.sleep(3000);
-		} catch (Exception e) {
+		}catch (Exception e) {
 			logger.warn("download error " + request.getUrl(),e);
 		}
 		return page;

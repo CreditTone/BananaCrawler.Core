@@ -34,7 +34,7 @@ public class Util {
 	}
 	
 	public static void main(String[] args) {
-		System.out.println(jqueryCompatibility("#root div:contains('授权码已过期')"));
+		System.out.println(jqueryCompatibility("a[class=right-arrow iconfont icon-btn_right]"));
 	}
 	
 }

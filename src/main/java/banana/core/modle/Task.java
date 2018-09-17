@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,6 +118,8 @@ public final class Task implements Writable, Cloneable {
 
 		public RetryCondition retry_condition;
 		
+		public String refresh_condition;
+		
 		public HashMap<String, Object>[] crawler_request;
 
 		public HashMap<String, Object>[] crawler_data;
@@ -128,6 +129,8 @@ public final class Task implements Writable, Cloneable {
 		public String[] actions;
 
 		public String[] logs;
+		
+		public String[] exorders;
 	}
 
 	public static final class Mode {
@@ -157,7 +160,7 @@ public final class Task implements Writable, Cloneable {
 		if (processors == null || processors.isEmpty()) {
 			throw new Exception("There is no processors");
 		}
-		if (downloader.startsWith("firefox")) {
+		if (downloader.startsWith("firefox") || downloader.startsWith("chrome") || downloader.startsWith("ie")) {
 			thread = 1;
 		}
 		Set<String> indexs = new HashSet<String>();
