@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
 
 public class JsonExtractor {
@@ -39,7 +40,22 @@ public class JsonExtractor {
 	public static Object catchExReadJson(String json,String readPath) {
 		try {
 			json = filterJSONP(json);
-			Object obj = JsonPath.read(json, readPath);
+			JsonSelector jsonSelector = new JsonSelector(readPath);
+			Object obj = null;
+			for (int i = 0;i < jsonSelector.getSteps().length;i++) {
+				String step = jsonSelector.getSteps()[i];
+				if (step.startsWith("[") && step.endsWith("]")) {
+					int index = Integer.parseInt(step.substring(1, step.length()-1));
+					JSONArray jsonArr = JSON.parseArray(obj.toString());
+					obj = jsonArr.get(index);
+				}else if (step.startsWith("(") && step.endsWith(")")) {
+					Filter filter = jsonSelector.getWhereCondition(jsonSelector.getSteps()[i]);
+					obj = JsonPath.read(json, "[?]", filter);
+				}else {
+					obj = JsonPath.read(json, jsonSelector.getSteps()[i]);
+				}
+				json = obj.toString();
+			}
 			return obj;
 		}catch(Exception e) {
 			logger.warn("catchExReadJson:"+e.getMessage());
@@ -61,8 +77,7 @@ public class JsonExtractor {
 	}
 	
 	public static Object doJsonOneExtractor(String parseConfig,String val) {
-		JsonSelector jsonSelector = new JsonSelector(parseConfig);
-		Object obj = catchExReadJson(val, jsonSelector.getJsonPath());
+		Object obj = catchExReadJson(val, parseConfig);
 		return obj;
 	}
 	

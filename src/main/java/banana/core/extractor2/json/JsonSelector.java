@@ -1,21 +1,22 @@
 package banana.core.extractor2.json;
 
+import com.jayway.jsonpath.Filter;
+
 public class JsonSelector {
 	
-	private String jsonPath;
+	private String[] steps;
 	
 	public JsonSelector(String v) {
-		String[] tks = v.split(";");
-		jsonPath = tks[0];
+		steps = v.split("\\.");
 	}
 
-	public String getJsonPath() {
-		return jsonPath;
+	public String[] getSteps() {
+		return steps;
+	}
+	
+	public static Filter getWhereCondition(String conditionStr) {
+		Condition condition = new Condition(conditionStr);
+		return condition.getFilter();
 	}
 
-	public void setJsonPath(String jsonPath) {
-		this.jsonPath = jsonPath;
-	}
-	
-	
 }
