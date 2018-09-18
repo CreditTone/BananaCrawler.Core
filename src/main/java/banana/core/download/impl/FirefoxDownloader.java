@@ -99,7 +99,7 @@ public class FirefoxDownloader extends DefaultHttpDownloader {
 	public Page download(PageRequest request) {
 		Page page = null;
 		try {
-			webDriver.get(request.getEncodeUrl());
+			webDriver.get(request.getUrl());
 			page = new Page();
 			if (webDriver.getPageSource().startsWith("<html><head></head><body><pre style=\"word-wrap: break-word; white-space: pre-wrap;\">")){
 				int beginIndex = 84;

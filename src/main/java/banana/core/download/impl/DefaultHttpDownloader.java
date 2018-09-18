@@ -172,7 +172,7 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		Set<Entry<String, String>> keyValues = headers.entrySet();
 		switch (request.getMethod()) {
 		case GET:
-			HttpGet get = new HttpGet(request.getEncodeUrl());
+			HttpGet get = new HttpGet(request.getUrl());
 			// 设置请求头
 			for (Entry<String, String> entry : keyValues) {
 				get.setHeader(entry.getKey(), entry.getValue());
