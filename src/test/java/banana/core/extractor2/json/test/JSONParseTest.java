@@ -35,7 +35,7 @@ public class JSONParseTest {
 	
 	@Test
 	public void testWhere() throws Exception{
-		Object result = JsonExtractor.doJsonOneExtractor("poi_list.[1].domain_list.(id='1010').[0].name", json);
+		Object result = JsonExtractor.doJsonOneExtractor("poi_list.[2].domain_list.(id='1001').[0].value", json);
 		System.out.println(result);
 	}
 

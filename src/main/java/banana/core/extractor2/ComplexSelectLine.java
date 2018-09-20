@@ -114,6 +114,9 @@ public class ComplexSelectLine {
 		
 		Object finalResult = currentRet;
 		for (String type : resultType) {
+			if (finalResult == null) {
+				break;
+			}
 			finalResult = Types.convertType(type, finalResult);
 		}
 		return finalResult;
