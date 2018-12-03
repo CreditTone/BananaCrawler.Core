@@ -44,15 +44,16 @@ public class HtmlUnitDriverPool extends DriverPoolInterface<HtmlUnitDriver> {
 	}
 
 	public static class AccessCookieHtmlUnitDriver extends HtmlUnitDriver {
+		
 		public AccessCookieHtmlUnitDriver() {
 			super(true);
 			WebClient webClient = getWebClient();
 			webClient.getOptions().setCssEnabled(false);
-			webClient.setAjaxController(new NicelyResynchronizingAjaxController());
 			//webClient.getOptions().setTimeout(50000);
 			webClient.getOptions().setThrowExceptionOnScriptError(false);
 			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);  
 			webClient.getOptions().setActiveXNative(false);  //设置是否允许本地ActiveX或没有。默认值是false。
+			webClient.setAjaxController(new NicelyResynchronizingAjaxController());
 		}
 
 		public void setCookies(Cookies cookies) {
