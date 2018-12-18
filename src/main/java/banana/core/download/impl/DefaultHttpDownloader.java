@@ -32,6 +32,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
 
 import banana.core.download.HttpDownloader;
 import banana.core.download.pool.HttpClientPool;
@@ -40,6 +41,8 @@ import banana.core.request.Cookie;
 import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
+import banana.core.request.RequestBuilder;
+import banana.core.request.PageRequest.PageEncoding;
 import banana.core.response.Page;
 import banana.core.response.StreamResponse;
 
@@ -98,6 +101,26 @@ public class DefaultHttpDownloader implements HttpDownloader {
 
 	@Override
 	public void close() throws IOException {
+	}
+	
+	public Page download(String url) {
+		try {
+			Page page = download((PageRequest) RequestBuilder.custom().setUrl(url).build());
+			return page;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public Page download(String url,PageEncoding pageEncoding) {
+		try {
+			Page page = download((PageRequest) RequestBuilder.custom().setUrl(url).setPageEncoding(pageEncoding).build());
+			return page;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override

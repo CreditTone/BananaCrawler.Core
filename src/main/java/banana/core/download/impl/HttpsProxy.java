@@ -11,6 +11,27 @@ public class HttpsProxy {
 	private String username;
 	
 	private String password;
+	
+	
+
+	public HttpsProxy() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	public HttpsProxy(String server, int port) {
+		super();
+		this.server = server;
+		this.port = port;
+	}
+
+	public HttpsProxy(String server, int port, String username, String password) {
+		super();
+		this.server = server;
+		this.port = port;
+		this.username = username;
+		this.password = password;
+	}
 
 	public String getServer() {
 		return server;
