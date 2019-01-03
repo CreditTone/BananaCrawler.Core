@@ -42,6 +42,7 @@ import banana.core.request.Cookies;
 import banana.core.request.HttpRequest;
 import banana.core.request.PageRequest;
 import banana.core.request.RequestBuilder;
+import banana.core.request.HttpRequest.Method;
 import banana.core.request.PageRequest.PageEncoding;
 import banana.core.response.Page;
 import banana.core.response.StreamResponse;
@@ -191,15 +192,14 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		Map<String, String> headers = getFirefoxHeaders();
 		headers.putAll(custom_headers);// 覆盖自定义请求头
 		Set<Entry<String, String>> keyValues = headers.entrySet();
-		switch (request.getMethod()) {
-		case GET:
+		if (request.getMethod() == Method.GET) {
 			HttpGet get = new HttpGet(request.getUrl());
 			// 设置请求头
 			for (Entry<String, String> entry : keyValues) {
 				get.setHeader(entry.getKey(), entry.getValue());
 			}
 			return get;
-		case POST:
+		}else if (request.getMethod() == Method.POST) {
 			HttpPost post = new HttpPost(request.getUrl());
 			// 设置请求头
 			for (Entry<String, String> entry : keyValues) {
