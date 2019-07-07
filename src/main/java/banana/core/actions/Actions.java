@@ -121,14 +121,12 @@ public class Actions {
 			}
 //			org.openqa.selenium.interactions.Actions seleniumAction = new org.openqa.selenium.interactions.Actions(webdriver);
 //			seleniumAction.moveToElement(element).build().perform();
-//			webdriver.executeScript("arguments[0].scrollTop=100;", element);
-			Thread.sleep(2000);
+//			webdriver.executeScript("arguments[0].scrollTop=100;", element);Thread.sleep(2000);
 			element.click();
 			context.put("_owner_url", webdriver.getCurrentUrl());
 			context.put("_content", webdriver.getPageSource());
 			response.setOwnerUrl((String) context.get("_owner_url"));
-			((Page)response).setContent((String) context.get("_content"));
-			Thread.sleep(5000);
+			((Page)response).setContent((String) context.get("_content"));Thread.sleep(5000);
 			if (statuskey != null) {
 				context.put(statuskey, true);
 			}
@@ -143,13 +141,11 @@ public class Actions {
 	
 	public void selenium_jsclick(String cssSelector, String statuskey) {
 		try {
-			webdriver.executeScript("document.querySelector(arguments[0]).click()", cssSelector);
-			Thread.sleep(2000);
+			webdriver.executeScript("document.querySelector(arguments[0]).click()", cssSelector);Thread.sleep(2000);
 			context.put("_owner_url", webdriver.getCurrentUrl());
 			context.put("_content", webdriver.getPageSource());
 			response.setOwnerUrl((String) context.get("_owner_url"));
-			((Page)response).setContent((String) context.get("_content"));
-			Thread.sleep(5000);
+			((Page)response).setContent((String) context.get("_content"));Thread.sleep(5000);
 			if (statuskey != null) {
 				context.put(statuskey, true);
 			}
@@ -172,8 +168,7 @@ public class Actions {
 				logger.info("元素不能编辑");
 			}
 			element.clear();
-			element.sendKeys(keys);
-			Thread.sleep(5000);
+			element.sendKeys(keys);Thread.sleep(5000);
 			if (statuskey != null) {
 				context.put(statuskey, true);
 			}

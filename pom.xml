@@ -95,19 +95,6 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 </project>

@@ -22,7 +22,7 @@ public interface HttpDownloader extends Closeable{
 
     public void setTimeout(int second);
     
-    public void setPorxy(HttpsProxy proxy);
+    public void setProxy(HttpsProxy proxy);
     
     public void injectCookies(Cookies cookies);
     

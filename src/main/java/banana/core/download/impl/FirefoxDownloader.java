@@ -110,24 +110,13 @@ public class FirefoxDownloader extends DefaultHttpDownloader {
 			page.setStatus(200);
 			page.setOwnerUrl(webDriver.getCurrentUrl());
 			page.setRequest(request);
-			page.setDriverId(webDriver.getSessionId().toString());
-			Thread.sleep(3000);
+			page.setDriverId(webDriver.getSessionId().toString());Thread.sleep(3000);
 		} catch (Exception e) {
 			logger.warn("download error " + request.getUrl(),e);
 		}
 		return page;
 	}
 	
-	@Override
-	public void close() throws IOException {
-		super.close();
-	}
-
-	@Override
-	public void open() {
-		super.open();
-	}
-
 	@Override
 	public boolean supportJavaScript() {
 		return true;

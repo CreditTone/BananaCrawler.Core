@@ -17,6 +17,7 @@ import org.apache.http.message.BasicNameValuePair;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
+import banana.core.download.impl.HttpsProxy;
 import banana.core.util.URLEncodedUtils;
 
 import java.util.Map.Entry;
@@ -43,6 +44,11 @@ public abstract class HttpRequest extends BasicRequest {
 	 * 请求头
 	 */
 	protected Map<String, String> headers = null;
+	
+	/**
+	 * https代理
+	 */
+	protected HttpsProxy httpsProxy = null;
 
 	protected String processor;
 
@@ -101,6 +107,14 @@ public abstract class HttpRequest extends BasicRequest {
 	public Set<Entry<String, String>> getParams() {
 		iniParmaContainer();
 		return this.requestParams.entrySet();
+	}
+
+	public HttpsProxy getHttpsProxy() {
+		return httpsProxy;
+	}
+
+	public void setHttpsProxy(HttpsProxy httpsProxy) {
+		this.httpsProxy = httpsProxy;
 	}
 
 	public Object getParamsByName(String name) {
@@ -188,8 +202,10 @@ public abstract class HttpRequest extends BasicRequest {
 		out.writeUTF(processor);
 		String headersJson = JSON.toJSONString(headers);
 		String requestParamsJson = JSON.toJSONString(requestParams);
+		String httpsProxyJson = JSON.toJSONString(httpsProxy);
 		out.writeUTF(headersJson);
 		out.writeUTF(requestParamsJson);
+		out.writeUTF(httpsProxyJson);
 	}
 
 	@Override
@@ -205,8 +221,11 @@ public abstract class HttpRequest extends BasicRequest {
 		processor = in.readUTF();
 		String headersJson = in.readUTF();
 		String requestParamsJson = in.readUTF();
+		String httpsProxyJson = in.readUTF();
 		headers = JSON.parseObject(headersJson, Map.class);
 		requestParams = JSON.parseObject(requestParamsJson, Map.class);
+		httpsProxy = JSON.parseObject(httpsProxyJson, HttpsProxy.class);
+		
 	}
 
 }

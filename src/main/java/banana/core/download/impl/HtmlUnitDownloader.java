@@ -49,15 +49,11 @@ public class HtmlUnitDownloader extends DefaultHttpDownloader {
 		return page;
 	}
 
-	@Override
 	public void close() throws IOException {
-		super.close();
 		driverPool.closeAll();
 	}
 
-	@Override
 	public void open() {
-		super.open();
 		driverPool.open();
 	}
 

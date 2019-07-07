@@ -2,6 +2,7 @@ package banana.core.download.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
+import java.util.regex.Pattern;
 import java.util.Set;
 
 import org.apache.http.HttpHost;
@@ -50,7 +51,7 @@ import banana.core.response.StreamResponse;
 /**
  * 缺省的PageDownloader使用HttpClient作为下载内核
  */
-public class DefaultHttpDownloader implements HttpDownloader {
+public class DefaultHttpDownloader implements HttpDownloader{
 
 	private final Logger log = Logger.getLogger(DefaultHttpDownloader.class);
 
@@ -61,6 +62,8 @@ public class DefaultHttpDownloader implements HttpDownloader {
 	private CloseableHttpClient httpClient;
 	
 	private BasicCookieStore cookieStore;
+	
+	private String userAgent;
 	
 	public DefaultHttpDownloader() {
 		this(null);
@@ -82,26 +85,23 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		}
 	}
 	
-	private BasicHttpContext getHttpContext() {
+	private BasicHttpContext getHttpContext(HttpRequest request) {
 		BasicHttpContext defaultContext = new BasicHttpContext();
 		Builder build = RequestConfig.custom().setSocketTimeout(timeout * 1000 * 3).setConnectTimeout(timeout * 1000)
 				.setConnectionRequestTimeout(timeout * 1000).setRedirectsEnabled(true).setCircularRedirectsAllowed(true);
-		if (httpsProxy != null) {
-			HttpHost proxy = new HttpHost(httpsProxy.getServer(),httpsProxy.getPort());
+		HttpsProxy tempProxy = request.getHttpsProxy()!=null?request.getHttpsProxy():this.httpsProxy;
+		if (tempProxy != null) {
+			HttpHost proxy = new HttpHost(tempProxy.getServer(),tempProxy.getPort());
 			build.setProxy(proxy);
-			if (httpsProxy.getUsername() != null && httpsProxy.getPassword() != null) {
+			if (tempProxy.getUsername() != null && tempProxy.getPassword() != null) {
 				CredentialsProvider credsProvider = new BasicCredentialsProvider(); //
-				  credsProvider.setCredentials(new AuthScope(httpsProxy.getServer(), httpsProxy.getPort()),
-				  new UsernamePasswordCredentials(httpsProxy.getUsername(), httpsProxy.getPassword()));
+				  credsProvider.setCredentials(new AuthScope(tempProxy.getServer(), tempProxy.getPort()),
+				  new UsernamePasswordCredentials(tempProxy.getUsername(), tempProxy.getPassword()));
 				  defaultContext.setAttribute(HttpClientContext.CREDS_PROVIDER, credsProvider);
 			}
 		}
 		defaultContext.setAttribute(HttpClientContext.REQUEST_CONFIG, build.build());
 		return defaultContext;
-	}
-
-	@Override
-	public void close() throws IOException {
 	}
 	
 	public Page download(String url) {
@@ -124,19 +124,19 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		return null;
 	}
 
-	@Override
 	public Page download(PageRequest request) {
 		Page page = null;
 		HttpRequestBase method = null;
 		try {
 			method = buildHttpUriRequest(request);
-			HttpContext httpContext = getHttpContext();
+			HttpContext httpContext = getHttpContext(request);
 			HttpResponse response = httpClient.execute(method, httpContext);
 			page = new Page(request, response);
 			page.setDriverId(String.valueOf(httpClient.hashCode()));
             page.setOwnerUrl(getOwnerUrl(httpContext));
             page.setRedirected(!method.getURI().toString().equals(page.getOwnerUrl()));
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.warn("download error " + request.getUrl(), e);
 		} finally {
 			if (method != null) {
@@ -147,13 +147,40 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		return page;
 	}
 	
-	@Override
+	
+	public Page downloadWithVrify(PageRequest request,String verifyPattern,int maxRetry) {
+		Page page = null;
+		Pattern verifyPat = null;
+		try {
+			verifyPat = Pattern.compile(verifyPattern);
+		}catch(Exception e) {}
+		for (int i = 0 ; i < maxRetry ; i ++) {
+			System.out.println("downloadWithVrify:"+request.getUrl());
+			try {Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			page = download(request);
+			if (page == null) {
+				continue;
+			}
+			System.out.println(Jsoup.parse(page.getContent()).text());
+			if (page.getContent().contains(verifyPattern)) {
+				break;
+			}
+			if (verifyPat != null && verifyPat.matcher(page.getContent()).find()) {
+				break;
+			}
+		}
+		return page;
+	}
+	
 	public StreamResponse downloadBinary(BinaryRequest request) {
 		HttpRequestBase method = null;
 		StreamResponse stream = null;
 		try {
 			method = buildHttpUriRequest(request);
-			HttpContext context = getHttpContext();
+			HttpContext context = getHttpContext(request);
 			HttpResponse response = httpClient.execute(method, context);
 			stream = new StreamResponse(request, response);
 			stream.setOwnerUrl(getOwnerUrl(context));
@@ -175,9 +202,14 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		return targetHost.toString();
 	}
 	
+	
 
-	@Override
-	public void open() {
+	public String getUserAgent() {
+		return userAgent;
+	}
+
+	public void setUserAgent(String userAgent) {
+		this.userAgent = userAgent;
 	}
 
 	/**
@@ -190,6 +222,9 @@ public class DefaultHttpDownloader implements HttpDownloader {
 	private final HttpRequestBase buildHttpUriRequest(HttpRequest request) throws UnsupportedEncodingException {
 		Map<String, String> custom_headers = request.getHedaers();
 		Map<String, String> headers = getFirefoxHeaders();
+		if (userAgent != null) {
+			headers.put("User-Agent", userAgent);
+		}
 		headers.putAll(custom_headers);// 覆盖自定义请求头
 		Set<Entry<String, String>> keyValues = headers.entrySet();
 		if (request.getMethod() == Method.GET) {
@@ -213,39 +248,36 @@ public class DefaultHttpDownloader implements HttpDownloader {
 					BasicNameValuePair pair = new BasicNameValuePair(entry.getKey(), entry.getValue());
 					nameValuePairs.add(pair);
 				}
-				post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+				post.setEntity(new UrlEncodedFormEntity(nameValuePairs,Charset.forName("UTF-8")));
+//				post.setEntity(new StringEntity(nameValuePairs));
 			}
 			return post;
 		}
 		return null;
 	}
-
+	
 	private static final Map<String, String> getFirefoxHeaders() {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 		headers.put("Accept-Encoding", "gzip, deflate");
 		headers.put("Connection", "keep-alive");
 		headers.put("Accept-Language", "zh-cn,zh;q=0.8,en-us;q=0.5,en;q=0.3");
-		headers.put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:56.0) Gecko/20100101 Firefox/56.0");
+		headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0");
 		return headers;
 	}
 
-	@Override
 	public boolean supportJavaScript() {
 		return false;
 	}
 
-	@Override
 	public void setTimeout(int second) {
 		this.timeout = second;
 	}
 	
-	@Override
-	public void setPorxy(HttpsProxy proxy) {
+	public void setProxy(HttpsProxy proxy) {
 		this.httpsProxy = proxy;
 	}
 
-	@Override
 	public void injectCookies(Cookies cookies) {
 		Iterator<Cookie> iter = cookies.iterator();
 		while(iter.hasNext()){
@@ -254,7 +286,6 @@ public class DefaultHttpDownloader implements HttpDownloader {
 		}
 	}
 
-	@Override
 	public Cookies getCookies() {
 		List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
 		Cookies cookies2 = new Cookies();
@@ -263,6 +294,18 @@ public class DefaultHttpDownloader implements HttpDownloader {
 					cookie.getExpiryDate(), cookie.isSecure(), false));
 		}
 		return cookies2;
+	}
+
+	@Override
+	public void close() throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void open() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

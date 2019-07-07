@@ -62,10 +62,8 @@ public class ChromeDownloader extends DefaultHttpDownloader {
 	}
 	
 	public static void main(String[] args) throws InterruptedException {
-		ChromeDownloader downloader = new ChromeDownloader("http://10.2.60.178:4444/wd/hub", null);
-		Thread.sleep(10 * 1000);
-		downloader.webDriver.get("http://wf.meituan.com");
-		Thread.sleep(60 * 1000);
+		ChromeDownloader downloader = new ChromeDownloader("http://10.2.60.178:4444/wd/hub", null);Thread.sleep(10 * 1000);
+		downloader.webDriver.get("http://wf.meituan.com");Thread.sleep(60 * 1000);
 	}
 	
 	@Override
@@ -83,24 +81,13 @@ public class ChromeDownloader extends DefaultHttpDownloader {
 			page.setStatus(200);
 			page.setOwnerUrl(webDriver.getCurrentUrl());
 			page.setRequest(request);
-			page.setDriverId(webDriver.getSessionId().toString());
-			Thread.sleep(3000);
+			page.setDriverId(webDriver.getSessionId().toString());Thread.sleep(3000);
 		}catch (Exception e) {
 			logger.warn("download error " + request.getUrl(),e);
 		}
 		return page;
 	}
 	
-	@Override
-	public void close() throws IOException {
-		super.close();
-	}
-
-	@Override
-	public void open() {
-		super.open();
-	}
-
 	@Override
 	public boolean supportJavaScript() {
 		return true;
